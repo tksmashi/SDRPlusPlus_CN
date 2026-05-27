@@ -11,6 +11,9 @@ env:
     BUILD_TYPE: Release
     GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
+permissions:
+    contents: write
+
 jobs:
     build_windows:
         runs-on: windows-latest
@@ -92,11 +95,15 @@ jobs:
           working-directory: ${{runner.workspace}}
           run: '&($Env:GITHUB_WORKSPACE + "/make_windows_package.ps1") ./build ($Env:GITHUB_WORKSPACE + "/root")'
 
+        - name: Rename Archive
+          working-directory: ${{runner.workspace}}
+          run: Rename-Item -Path sdrpp_windows_x64.zip -NewName sdrpp_windows_x64_cn.zip
+
         - name: Save Archive
           uses: actions/upload-artifact@v4
           with:
               name: sdrpp_windows_x64_cn
-              path: ${{runner.workspace}}/sdrpp_windows_x64.zip
+              path: ${{runner.workspace}}/sdrpp_windows_x64_cn.zip
 
     build_android:
         runs-on: ubuntu-latest
@@ -117,10 +124,112 @@ jobs:
 
         - name: Recover APK
           working-directory: ${{runner.workspace}}
-          run: docker cp build:/root/SDRPlusPlus/android/app/build/outputs/apk/debug/app-debug.apk ./ && mv app-debug.apk sdrpp_cn.apk
+          run: docker cp build:/root/SDRPlusPlus/android/app/build/outputs/apk/debug/app-debug.apk ./ && mv app-debug.apk sdrpp_android_cn.apk
 
         - name: Save APK
           uses: actions/upload-artifact@v4
           with:
               name: sdrpp_android_cn
-              path: ${{runner.workspace}}/sdrpp_cn.apk
+              path: ${{runner.workspace}}/sdrpp_android_cn.apk
+
+    release:
+        needs: [build_windows, build_android]
+        runs-on: ubuntu-latest
+
+        steps:
+        - uses: actions/checkout@v4
+          with:
+              fetch-depth: 0
+
+        - name: Download Windows artifact
+          uses: actions/download-artifact@v4
+          with:
+              name: sdrpp_windows_x64_cn
+              path: ./release_assets
+
+        - name: Download Android artifact
+          uses: actions/download-artifact@v4
+          with:
+              name: sdrpp_android_cn
+              path: ./release_assets
+
+        - name: Generate release info
+          id: info
+          run: |
+              TAG="cn-$(date +'%Y.%m.%d')"
+              SHORT_SHA=$(git rev-parse --short HEAD)
+              # 如果同一天有多次推送，追加短 SHA 区分
+              EXISTING=$(gh release view "$TAG" --json tagName -q '.tagName' 2>/dev/null || echo "")
+              if [ -n "$EXISTING" ]; then
+                  TAG="${TAG}-${SHORT_SHA}"
+              fi
+              echo "tag=$TAG" >> $GITHUB_OUTPUT
+              echo "short_sha=$SHORT_SHA" >> $GITHUB_OUTPUT
+              echo "build_date=$(date +'%Y-%m-%d %H:%M')" >> $GITHUB_OUTPUT
+
+              # 获取最近 10 条提交记录
+              COMMITS=$(git log --oneline -10 --no-decorate)
+              {
+                  echo "commits<<EOF"
+                  echo "$COMMITS"
+                  echo "EOF"
+              } >> $GITHUB_OUTPUT
+
+              # 获取上游基准信息
+              UPSTREAM_INFO=""
+              if git remote | grep -q upstream; then
+                  UPSTREAM_INFO=$(git log upstream/master --oneline -1 2>/dev/null || echo "")
+              fi
+              echo "upstream_info=$UPSTREAM_INFO" >> $GITHUB_OUTPUT
+          env:
+              GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+        - name: Create Release
+          uses: softprops/action-gh-release@v2
+          with:
+              tag_name: ${{ steps.info.outputs.tag }}
+              name: "SDR++ 汉化版 ${{ steps.info.outputs.build_date }}"
+              body: |
+                  ## SDR++ 汉化版自动构建
+
+                  📅 **构建时间**: ${{ steps.info.outputs.build_date }}
+                  🔗 **Commit**: `${{ steps.info.outputs.short_sha }}`
+
+                  ### 下载
+
+                  | 文件 | 平台 | 说明 |
+                  |------|------|------|
+                  | `sdrpp_windows_x64_cn.zip` | Windows x64 | 解压后运行 `sdrpp.exe` |
+                  | `sdrpp_android_cn.apk` | Android | 侧载安装，需要 RTL-SDR 等 USB SDR 硬件 |
+
+                  ### 最近提交
+
+                  ```
+                  ${{ steps.info.outputs.commits }}
+                  ```
+
+                  ---
+
+                  > 本构建基于 [AlexandreRouma/SDRPlusPlus](https://github.com/AlexandreRouma/SDRPlusPlus)，以 GPL-3.0 发布。
+                  > 汉化内容：81 个源文件 UI 中文化 + 跨平台 CJK 字体适配。
+              files: |
+                  ./release_assets/sdrpp_windows_x64_cn.zip
+                  ./release_assets/sdrpp_android_cn.apk
+              draft: false
+              prerelease: false
+          env:
+              GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+        - name: Cleanup old releases
+          run: |
+              # 保留最近 10 个 Release，删除更早的
+              RELEASES=$(gh release list --limit 50 -L 50 -q '.[].tagName' 2>/dev/null | grep "^cn-" || true)
+              COUNT=$(echo "$RELEASES" | wc -l)
+              if [ "$COUNT" -gt 10 ]; then
+                  echo "$RELEASES" | tail -n +11 | while read -r tag; do
+                      echo "Deleting old release: $tag"
+                      gh release delete "$tag" --yes --cleanup-tag 2>/dev/null || true
+                  done
+              fi
+          env:
+              GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}

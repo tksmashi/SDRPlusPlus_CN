@@ -75,8 +75,19 @@
 | 工作流 | 文件 | 功能 |
 |--------|------|------|
 | 上游同步 | `sync-upstream.yml` | 每日检测上游新提交 |
-| 汉化构建 | `build_cn.yml` | 汉化后编译 Windows 版本 |
+| 汉化构建+发布 | `build_cn.yml` | 编译 Windows + Android 版本，自动创建 GitHub Release |
 | 全平台构建 | `build_all.yml` | 多平台编译发布 |
+
+### 下载
+
+每次推送到 `master` 分支后自动构建并发布到 [Releases](../../releases) 页面。
+
+| 文件 | 平台 | 说明 |
+|------|------|------|
+| `sdrpp_windows_x64_cn.zip` | Windows x64 | 解压后运行 `sdrpp.exe` |
+| `sdrpp_android_cn.apk` | Android | 侧载安装，需要 RTL-SDR 等 USB SDR 硬件 |
+
+Release 标签格式：`cn-YYYY.MM.DD`（同日多次推送追加短 SHA）。自动保留最近 10 个 Release。
 
 ## 仓库结构
 
