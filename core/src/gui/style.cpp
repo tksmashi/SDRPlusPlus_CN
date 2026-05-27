@@ -81,25 +81,36 @@ namespace style {
         std::string cjkFontPath = findCJKFont();
         bool hasCJKFont = !cjkFontPath.empty();
 
-        // Create base font range (with full CJK support)
+#ifdef __ANDROID__
+        // Android: use ChineseSimplifiedCommon (~2500 chars) instead of ChineseFull (~27000 chars)
+        // because uiScale=3.0 makes font bitmaps 9x larger, causing texture atlas overflow
+        // which renders as black squares (■) instead of Chinese characters
+        const ImWchar* cjkGlyphRange = fonts->GetGlyphRangesChineseSimplifiedCommon();
+        // Increase atlas width to help fit glyphs within GPU texture size limits
+        fonts->TexDesiredWidth = 2048;
+#else
+        // Desktop: full CJK range is fine (larger GPU texture limits, lower uiScale)
+        const ImWchar* cjkGlyphRange = fonts->GetGlyphRangesChineseFull();
+#endif
+
+        // Create base font range (with CJK support)
         ImFontGlyphRangesBuilder baseBuilder;
         baseBuilder.AddRanges(fonts->GetGlyphRangesDefault());
         baseBuilder.AddRanges(fonts->GetGlyphRangesCyrillic());
         if (hasCJKFont) {
-            baseBuilder.AddRanges(fonts->GetGlyphRangesChineseFull());
+            baseBuilder.AddRanges(cjkGlyphRange);
         }
         baseBuilder.BuildRanges(&baseRanges);
 
-        // Create big font range (digits + CJK for frequency window labels)
+        // Create big font range (digits only for frequency display)
+        // NOTE: CJK is NOT merged into bigFont — it's only used for frequency digits,
+        // and on Android with uiScale=3.0, 135px CJK glyphs would overflow the texture atlas
         ImFontGlyphRangesBuilder bigBuilder;
         const ImWchar bigRange[] = { '.', '9', 0 };
         bigBuilder.AddRanges(bigRange);
-        if (hasCJKFont) {
-            bigBuilder.AddRanges(fonts->GetGlyphRangesChineseFull());
-        }
         bigBuilder.BuildRanges(&bigRanges);
 
-        // Create huge font range
+        // Create huge font range (splash screen "SDR++" text only)
         ImFontGlyphRangesBuilder hugeBuilder;
         const ImWchar hugeRange[] = { 'S', 'S', 'D', 'D', 'R', 'R', '+', '+', ' ', ' ', 0 };
         hugeBuilder.AddRanges(hugeRange);
@@ -108,29 +119,25 @@ namespace style {
         // Load base font (Roboto for Latin, with CJK glyphs merged from system font)
         baseFont = fonts->AddFontFromFileTTF(((std::string)(resDir + "/fonts/Roboto-Medium.ttf")).c_str(), 16.0f * uiScale, NULL, baseRanges.Data);
 
-        // Merge CJK font into baseFont so Chinese characters render correctly (full range)
+        // Merge CJK font into baseFont so Chinese characters render correctly
         if (hasCJKFont) {
             ImFontConfig cjkConfig;
             cjkConfig.MergeMode = true;
             cjkConfig.PixelSnapH = true;
-            fonts->AddFontFromFileTTF(cjkFontPath.c_str(), 16.0f * uiScale, &cjkConfig, fonts->GetGlyphRangesChineseFull());
+            fonts->AddFontFromFileTTF(cjkFontPath.c_str(), 16.0f * uiScale, &cjkConfig, cjkGlyphRange);
+#ifdef __ANDROID__
+            flog::info("CJK font merged into base font (SimplifiedCommon range for Android)");
+#else
             flog::info("CJK font merged into base font (full range)");
+#endif
         } else {
             flog::warn("No CJK font found! Chinese characters may not display correctly.");
         }
 
-        // Add bigger fonts for frequency select and title
+        // Load big font (frequency display — Latin digits only, no CJK merge)
         bigFont = fonts->AddFontFromFileTTF(((std::string)(resDir + "/fonts/Roboto-Medium.ttf")).c_str(), 45.0f * uiScale, NULL, bigRanges.Data);
 
-        // Merge CJK font into bigFont for frequency window labels
-        if (hasCJKFont) {
-            ImFontConfig bigCjkConfig;
-            bigCjkConfig.MergeMode = true;
-            bigCjkConfig.PixelSnapH = true;
-            fonts->AddFontFromFileTTF(cjkFontPath.c_str(), 45.0f * uiScale, &bigCjkConfig, fonts->GetGlyphRangesChineseFull());
-            flog::info("CJK font merged into big font");
-        }
-
+        // Load huge font (splash screen title)
         hugeFont = fonts->AddFontFromFileTTF(((std::string)(resDir + "/fonts/Roboto-Medium.ttf")).c_str(), 128.0f * uiScale, NULL, hugeRanges.Data);
 
         return true;
