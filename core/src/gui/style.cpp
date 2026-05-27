@@ -19,6 +19,47 @@ namespace style {
     float uiScale = 3.0f;
 #endif
 
+    // Find a CJK font on the system
+    static std::string findCJKFont() {
+        // List of CJK font paths to try, in order of preference
+        const char* cjkFontPaths[] = {
+#ifdef _WIN32
+            // Windows: Microsoft YaHei (most common on Chinese Windows)
+            "C:/Windows/Fonts/msyh.ttc",
+            // Windows: Microsoft YaHei Bold
+            "C:/Windows/Fonts/msyhbd.ttc",
+            // Windows: SimHei (classic Chinese font)
+            "C:/Windows/Fonts/simhei.ttf",
+            // Windows: SimSun
+            "C:/Windows/Fonts/simsun.ttc",
+#elif __APPLE__
+            // macOS: PingFang SC
+            "/System/Library/Fonts/PingFang.ttc",
+            "/Library/Fonts/Arial Unicode.ttf",
+#else
+            // Linux: common CJK font paths
+            "/usr/share/fonts/opentype/noto/NotoSansCJK-Regular.ttc",
+            "/usr/share/fonts/noto-cjk/NotoSansCJK-Regular.ttc",
+            "/usr/share/fonts/truetype/noto/NotoSansCJK-Regular.ttc",
+            "/usr/share/fonts/noto/NotoSansCJK-Regular.ttc",
+            "/usr/share/fonts/opentype/noto/NotoSansSC-Regular.otf",
+            "/usr/share/fonts/truetype/droid/DroidSansFallbackFull.ttf",
+            "/usr/share/fonts/truetype/wqy/wqy-microhei.ttc",
+            "/usr/share/fonts/truetype/wqy/wqy-zenhei.ttc",
+#endif
+            NULL
+        };
+
+        for (int i = 0; cjkFontPaths[i] != NULL; i++) {
+            if (std::filesystem::exists(cjkFontPaths[i])) {
+                flog::info("Found CJK font: {0}", cjkFontPaths[i]);
+                return cjkFontPaths[i];
+            }
+        }
+
+        return "";
+    }
+
     bool loadFonts(std::string resDir) {
         ImFontAtlas* fonts = ImGui::GetIO().Fonts;
         if (!std::filesystem::is_directory(resDir)) {
@@ -26,10 +67,17 @@ namespace style {
             return false;
         }
 
-        // Create base font range
+        // Find a CJK font for Chinese character support
+        std::string cjkFontPath = findCJKFont();
+        bool hasCJKFont = !cjkFontPath.empty();
+
+        // Create base font range (with CJK support)
         ImFontGlyphRangesBuilder baseBuilder;
         baseBuilder.AddRanges(fonts->GetGlyphRangesDefault());
         baseBuilder.AddRanges(fonts->GetGlyphRangesCyrillic());
+        if (hasCJKFont) {
+            baseBuilder.AddRanges(fonts->GetGlyphRangesChineseSimplifiedCommon());
+        }
         baseBuilder.BuildRanges(&baseRanges);
 
         // Create big font range
@@ -44,8 +92,21 @@ namespace style {
         hugeBuilder.AddRanges(hugeRange);
         hugeBuilder.BuildRanges(&hugeRanges);
         
-        // Add bigger fonts for frequency select and title
+        // Load base font (Roboto for Latin, with CJK glyphs merged from system font)
         baseFont = fonts->AddFontFromFileTTF(((std::string)(resDir + "/fonts/Roboto-Medium.ttf")).c_str(), 16.0f * uiScale, NULL, baseRanges.Data);
+
+        // Merge CJK font into baseFont so Chinese characters render correctly
+        if (hasCJKFont) {
+            ImFontConfig cjkConfig;
+            cjkConfig.MergeMode = true;
+            cjkConfig.PixelSnapH = true;
+            fonts->AddFontFromFileTTF(cjkFontPath.c_str(), 16.0f * uiScale, &cjkConfig, fonts->GetGlyphRangesChineseSimplifiedCommon());
+            flog::info("CJK font merged into base font");
+        } else {
+            flog::warn("No CJK font found! Chinese characters may not display correctly.");
+        }
+
+        // Add bigger fonts for frequency select and title
         bigFont = fonts->AddFontFromFileTTF(((std::string)(resDir + "/fonts/Roboto-Medium.ttf")).c_str(), 45.0f * uiScale, NULL, bigRanges.Data);
         hugeFont = fonts->AddFontFromFileTTF(((std::string)(resDir + "/fonts/Roboto-Medium.ttf")).c_str(), 128.0f * uiScale, NULL, hugeRanges.Data);
 
