@@ -45,6 +45,7 @@
 |------|---------|---------|
 | Windows | `msyh.ttc`（微软雅黑） | `GetGlyphRangesChineseFull()` |
 | macOS | `PingFang.ttc`（苹方） | `GetGlyphRangesChineseFull()` |
+| Android | `NotoSansCJK-Regular.ttc` / `NotoSansSC-Regular.otf` | `GetGlyphRangesChineseFull()` |
 | Linux | `NotoSansCJK*.ttc` / `WenQuanYi*.ttc` | `GetGlyphRangesChineseFull()` |
 
 - baseFont（默认 UI 字体）与 bigFont（频率窗口 45px）均已合并 CJK 支持

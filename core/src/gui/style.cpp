@@ -36,6 +36,16 @@ namespace style {
             // macOS: PingFang SC
             "/System/Library/Fonts/PingFang.ttc",
             "/Library/Fonts/Arial Unicode.ttf",
+#elif defined(__ANDROID__)
+            // Android: NotoSans CJK (Android 7+, most common)
+            "/system/fonts/NotoSansCJK-Regular.ttc",
+            "/system/fonts/NotoSansSC-Regular.otf",
+            "/system/fonts/NotoSansSC-Regular.ttf",
+            // Android: DroidSans Fallback (older Android)
+            "/system/fonts/DroidSansFallbackFull.ttf",
+            "/system/fonts/DroidSansFallback.ttf",
+            // Android: NotoSerif CJK (some devices)
+            "/system/fonts/NotoSerifCJK-Regular.ttc",
 #else
             // Linux: common CJK font paths
             "/usr/share/fonts/opentype/noto/NotoSansCJK-Regular.ttc",
