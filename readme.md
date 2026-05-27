@@ -1,90 +1,103 @@
-# SDR++ 汉化版 — 自动化构建仓库
+# SDR++ 汉化版
 
+[![License: GPL-3.0](https://img.shields.io/badge/License-GPL%203.0-blue.svg)](license)
 [![上游同步](https://github.com/AlexandreRouma/SDRPlusPlus/workflows/Build%20Binaries/badge.svg)](https://github.com/AlexandreRouma/SDRPlusPlus)
 
-基于 [AlexandreRouma/SDRPlusPlus](https://github.com/AlexandreRouma/SDRPlusPlus) 的 SDR++ 中文汉化版本，实现了**自动拉取上游更新 → 自动汉化 → 自动编译输出**的完整自动化流程。
+> **衍生作品声明**：本仓库是 [AlexandreRouma/SDRPlusPlus](https://github.com/AlexandreRouma/SDRPlusPlus) 的修改版本。
+> 原作品版权 © AlexandreRouma，以 GNU General Public License v3.0 发布。
+> 本修改版本同样以 GPL-3.0 发布，修改内容为界面中文化、CJK 字体适配及自动化构建流程。
+> 修改日期：2025 年 5 月。
 
-## 仓库结构
+基于 SDR++ 的中文汉化版本，实现**自动拉取上游更新 → 自动汉化 → 自动编译输出**的完整流程。
 
-```
-SDRPlusPlus_CN/
-├── scripts/                    # 🔄 自动化流程脚本
-│   ├── sync_upstream.sh        # 上游同步脚本（check/merge 模式）
-│   └── localized_files.txt     # 已汉化文件清单（67 个文件）
-├── .github/                    # ⚙️ CI/CD 工作流
-│   └── workflows/
-│       └── sync-upstream.yml   # 每日自动检测上游更新
-├── .workbuddy/                 # 🤖 AI 汉化自动化配置
-│
-├── CMakeLists.txt              # 构建配置（已添加 MSVC /utf-8 标志）
-├── core/                       # 核心界面源码（已汉化）
-├── decoder_modules/            # 解调模块源码（已汉化）
-├── misc_modules/               # 杂项模块源码（已汉化）
-├── sink_modules/               # 输出模块源码（已汉化）
-├── source_modules/             # 信号源模块源码（已汉化）
-├── root/                       # 资源文件（主题/色彩图/图标等）
-├── src/                        # 主入口源码
-├── android/                    # Android 构建配置
-├── docker_builds/              # Docker 构建脚本
-├── macos/                      # macOS 构建脚本
-├── win32/                      # Windows 构建脚本
-└── readme.md                   # 本文件
-```
+## 与上游的主要差异
 
-> **注意**：源码目录保持与上游一致的文件结构，以确保 `git merge` 同步更新时不会产生路径冲突。
+| 修改类别 | 内容 |
+|---------|------|
+| 界面汉化 | 81 个源文件中的英文 UI 字符串替换为中文 |
+| CJK 字体 | 自动检测系统 CJK 字体，baseFont / bigFont 均合并 `ChineseFull` 字形范围 |
+| 编译适配 | MSVC 添加 `/utf-8` 标志，确保 UTF-8 字符串字面量正确编译 |
+| CI/CD | 新增上游同步检测、汉化构建、多平台编译发布工作流 |
+| 自动化脚本 | `scripts/` 目录新增同步与汉化流程脚本 |
+
+## 汉化范围
+
+| 类别 | 模块 | 状态 |
+|------|------|------|
+| 核心界面 | 主窗口、信号源菜单、显示设置、频段规划、主题、VFO 颜色、模块管理、关于对话框、瀑布图控件 | ✅ |
+| 解调模块 | Radio (AM/NFM/WFM/DSB/USB/CW/LSB)、寻呼机、气象卫星、Falcon9、ATV、VOR、Meteor、M17、SSTV | ✅ |
+| 杂项模块 | 录制器、频率管理器、rigctl 服务器/客户端、扫描器、IQ 导出、调度器 | ✅ |
+| 输出模块 | 音频输出、网络音频输出 | ✅ |
+| 信号源模块 | 全部 28+ 信号源模块 | ✅ |
+
+### 汉化约定
+
+- **技术缩写保留英文**：AGC, LNA, VGA, Bias-T, FM, PPM, IQ, RF, VFO, FFT, SNR, CTCSS, RDS, DCS 等
+- **单位保留英文**：MHz, kHz, Hz
+- **调制模式保留英文**：NFM, WFM, AM, DSB, USB, CW, LSB, RAW
+- **ImGui 内部 ID**（`##xxx` 后缀）保持不变
+- **OptionList.define()** 第一个参数（key）不变，只改第二个参数（显示文本）
+- **不翻译**：ImGui 库文件、主题/色彩图/频段规划 JSON 名称、开发者日志消息
+
+### CJK 字体适配
+
+| 平台 | 检测字体 | 字形范围 |
+|------|---------|---------|
+| Windows | `msyh.ttc`（微软雅黑） | `GetGlyphRangesChineseFull()` |
+| macOS | `PingFang.ttc`（苹方） | `GetGlyphRangesChineseFull()` |
+| Linux | `NotoSansCJK*.ttc` / `WenQuanYi*.ttc` | `GetGlyphRangesChineseFull()` |
+
+- baseFont（默认 UI 字体）与 bigFont（频率窗口 45px）均已合并 CJK 支持
+- MSVC 编译添加 `/utf-8` 标志，防止 GBK 误编码
 
 ## 自动化流程
 
-### 1. 上游同步检测
+```
+上游新提交 → GitHub Actions 检测 → 合并到本仓库 → AI 汉化补丁 → 自动编译 → Release 发布
+```
 
-GitHub Actions 每日定时检查上游仓库是否有新提交：
+### 上游同步
 
 ```bash
-# 手动检查上游更新
+# 检查上游是否有新提交
 ./scripts/sync_upstream.sh check
 
 # 合并上游更新
 ./scripts/sync_upstream.sh merge
 ```
 
-### 2. 自动汉化
+- **GitHub Actions**（`.github/workflows/sync-upstream.yml`）：每日定时检查上游更新
+- **汉化文件清单**（`scripts/localized_files.txt`）：记录 81 个已汉化文件路径
 
-当检测到上游更新并合并后，WorkBuddy 自动化流程将：
-1. 对比 `scripts/localized_files.txt` 中的文件列表
-2. 识别合并冲突或新增内容
-3. 重新执行汉化补丁
+### CI/CD 工作流
 
-### 3. 自动编译
+| 工作流 | 文件 | 功能 |
+|--------|------|------|
+| 上游同步 | `sync-upstream.yml` | 每日检测上游新提交 |
+| 汉化构建 | `build_cn.yml` | 汉化后编译 Windows 版本 |
+| 全平台构建 | `build_all.yml` | 多平台编译发布 |
 
-通过 GitHub Actions 完成多平台编译输出。
+## 仓库结构
 
-## 汉化范围
+```
+SDRPlusPlus_CN/
+├── scripts/                    # 自动化流程脚本
+│   ├── sync_upstream.sh        #   上游同步脚本
+│   └── localized_files.txt     #   已汉化文件清单
+├── .github/workflows/          # CI/CD 工作流
+├── .workbuddy/                 # AI 汉化自动化配置
+├── CMakeLists.txt              # 构建配置（含 /utf-8 标志）
+├── core/                       # 核心界面源码
+├── decoder_modules/            # 解调模块源码
+├── misc_modules/               # 杂项模块源码
+├── sink_modules/               # 输出模块源码
+├── source_modules/             # 信号源模块源码
+├── root/                       # 资源文件（主题/色彩图/图标）
+├── src/                        # 主入口源码
+└── license                     # GPL-3.0 许可证
+```
 
-### 已完成模块
-
-| 类别 | 模块 | 状态 |
-|------|------|------|
-| 核心界面 | 主窗口、信号源菜单、显示设置、频段规划、主题、VFO 颜色、模块管理、关于对话框、瀑布图控件 | ✅ |
-| 解调模块 | Radio (AM/NFM/WFM/DSB/USB/CW/LSB)、寻呼机、气象卫星、Falcon9、ATV、VOR、Meteor、M17 | ✅ |
-| 杂项模块 | 录制器、频率管理器、rigctl 服务器/客户端、扫描器、IQ 导出、调度器 | ✅ |
-| 输出模块 | 网络音频输出 | ✅ |
-| 信号源模块 | 全部 28+ 信号源模块 | ✅ |
-
-### 汉化约定
-
-- **技术缩写保留英文**：AGC, LNA, VGA, Bias-T, FM, DAB, PPM, IQ, RF, VFO, FFT, SNR, CTCSS, RDS 等
-- **单位保留英文**：MHz, kHz, Hz
-- **调制模式保留英文**：NFM, WFM, AM, DSB, USB, CW, LSB, RAW
-- **ImGui 内部 ID**（`##xxx` 后缀）保持不变
-- **OptionList.define()** 第一个参数（key）保持不变，只改第二个参数（显示文本）
-- **不翻译的内容**：ImGui 库文件、主题名称 JSON、色彩图名称 JSON、频段规划名称 JSON、开发者日志消息
-
-### CJK 字体支持
-
-- 自动检测系统 CJK 字体（Windows: 微软雅黑, macOS: 苹方, Linux: NotoSansCJK）
-- 使用 `GetGlyphRangesChineseFull()` 完整中文字形范围
-- baseFont、bigFont 均已合并 CJK 字体支持
-- MSVC 编译器已添加 `/utf-8` 标志
+> 源码目录结构与上游保持一致，确保 `git merge` 同步时不产生路径冲突。
 
 ## 编译
 
@@ -111,10 +124,10 @@ make -j$(nproc)
 ## 相关链接
 
 - **上游仓库**：[AlexandreRouma/SDRPlusPlus](https://github.com/AlexandreRouma/SDRPlusPlus)
-- **Patreon**：[patreon.com/ryzerth](https://patreon.com/ryzerth)
-- **Discord**：[discord.gg/aFgWjyD](https://discord.gg/aFgWjyD)
+- **原作者 Patreon**：[patreon.com/ryzerth](https://patreon.com/ryzerth)
+- **原作者 Discord**：[discord.gg/aFgWjyD](https://discord.gg/aFgWjyD)
 - **原版下载**：[sdrpp.org/nightly](https://www.sdrpp.org/nightly)
 
 ## License
 
-与上游相同，遵循 [GPLv3 License](license)。
+本仓库以 [GNU General Public License v3.0](license) 发布，与上游许可证一致。
