@@ -459,7 +459,7 @@ private:
 
         ImGui::TableSetColumnIndex(1);
         if (selectedNames.size() == 0 && _this->selectedListName != "") { style::beginDisabled(); }
-        if (ImGui::Button(("Remove##_freq_mgr_rem_" + _this->name).c_str(), ImVec2(ImGui::GetContentRegionAvail().x, 0))) {
+        if (ImGui::Button(("删除##_freq_mgr_rem_" + _this->name).c_str(), ImVec2(ImGui::GetContentRegionAvail().x, 0))) {
             _this->deleteBookmarksOpen = true;
         }
         if (selectedNames.size() == 0 && _this->selectedListName != "") { style::endDisabled(); }

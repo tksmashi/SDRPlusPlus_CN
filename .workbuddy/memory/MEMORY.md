@@ -68,6 +68,10 @@
 - imgui_demo.cpp 是 ImGui 库的演示文件，不需要翻译
 - MSVC 编译必须加 /utf-8（CMakeLists.txt 已配置），否则中文字符串按 GBK 解读致乱码
 - 中文字体通过系统 CJK 字体 + ImGui MergeMode 合并到 Roboto baseFont（style.cpp 已配置）
+- 使用 GetGlyphRangesChineseFull() 完整中文字形范围（非 ChineseSimplifiedCommon）
+- bigFont（45px 频率窗口字体）也已合并 CJK 字体，支持中文标签
+- Sink provider 注册名已翻译：Audio→音频, Network→网络, New Audio→新音频
+- defConfig 菜单/模块实例名已翻译：Source→信号源, Recorder→录制器, Frequency Manager→频率管理器 等
 
 ## 不翻译的内容
 - imgui_demo.cpp / imgui_widgets.cpp 等 ImGui 库文件

@@ -71,19 +71,22 @@ namespace style {
         std::string cjkFontPath = findCJKFont();
         bool hasCJKFont = !cjkFontPath.empty();
 
-        // Create base font range (with CJK support)
+        // Create base font range (with full CJK support)
         ImFontGlyphRangesBuilder baseBuilder;
         baseBuilder.AddRanges(fonts->GetGlyphRangesDefault());
         baseBuilder.AddRanges(fonts->GetGlyphRangesCyrillic());
         if (hasCJKFont) {
-            baseBuilder.AddRanges(fonts->GetGlyphRangesChineseSimplifiedCommon());
+            baseBuilder.AddRanges(fonts->GetGlyphRangesChineseFull());
         }
         baseBuilder.BuildRanges(&baseRanges);
 
-        // Create big font range
+        // Create big font range (digits + CJK for frequency window labels)
         ImFontGlyphRangesBuilder bigBuilder;
         const ImWchar bigRange[] = { '.', '9', 0 };
         bigBuilder.AddRanges(bigRange);
+        if (hasCJKFont) {
+            bigBuilder.AddRanges(fonts->GetGlyphRangesChineseFull());
+        }
         bigBuilder.BuildRanges(&bigRanges);
 
         // Create huge font range
@@ -95,19 +98,29 @@ namespace style {
         // Load base font (Roboto for Latin, with CJK glyphs merged from system font)
         baseFont = fonts->AddFontFromFileTTF(((std::string)(resDir + "/fonts/Roboto-Medium.ttf")).c_str(), 16.0f * uiScale, NULL, baseRanges.Data);
 
-        // Merge CJK font into baseFont so Chinese characters render correctly
+        // Merge CJK font into baseFont so Chinese characters render correctly (full range)
         if (hasCJKFont) {
             ImFontConfig cjkConfig;
             cjkConfig.MergeMode = true;
             cjkConfig.PixelSnapH = true;
-            fonts->AddFontFromFileTTF(cjkFontPath.c_str(), 16.0f * uiScale, &cjkConfig, fonts->GetGlyphRangesChineseSimplifiedCommon());
-            flog::info("CJK font merged into base font");
+            fonts->AddFontFromFileTTF(cjkFontPath.c_str(), 16.0f * uiScale, &cjkConfig, fonts->GetGlyphRangesChineseFull());
+            flog::info("CJK font merged into base font (full range)");
         } else {
             flog::warn("No CJK font found! Chinese characters may not display correctly.");
         }
 
         // Add bigger fonts for frequency select and title
         bigFont = fonts->AddFontFromFileTTF(((std::string)(resDir + "/fonts/Roboto-Medium.ttf")).c_str(), 45.0f * uiScale, NULL, bigRanges.Data);
+
+        // Merge CJK font into bigFont for frequency window labels
+        if (hasCJKFont) {
+            ImFontConfig bigCjkConfig;
+            bigCjkConfig.MergeMode = true;
+            bigCjkConfig.PixelSnapH = true;
+            fonts->AddFontFromFileTTF(cjkFontPath.c_str(), 45.0f * uiScale, &bigCjkConfig, fonts->GetGlyphRangesChineseFull());
+            flog::info("CJK font merged into big font");
+        }
+
         hugeFont = fonts->AddFontFromFileTTF(((std::string)(resDir + "/fonts/Roboto-Medium.ttf")).c_str(), 128.0f * uiScale, NULL, hugeRanges.Data);
 
         return true;

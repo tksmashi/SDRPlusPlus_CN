@@ -135,29 +135,35 @@ int sdrpp_main(int argc, char* argv[]) {
     // Menu
     defConfig["menuElements"] = json::array();
 
-    defConfig["menuElements"][0]["name"] = "Source";
+    defConfig["menuElements"][0]["name"] = "信号源";
     defConfig["menuElements"][0]["open"] = true;
 
     defConfig["menuElements"][1]["name"] = "Radio";
     defConfig["menuElements"][1]["open"] = true;
 
-    defConfig["menuElements"][2]["name"] = "Recorder";
+    defConfig["menuElements"][2]["name"] = "录制器";
     defConfig["menuElements"][2]["open"] = true;
 
-    defConfig["menuElements"][3]["name"] = "Sinks";
+    defConfig["menuElements"][3]["name"] = "音频输出";
     defConfig["menuElements"][3]["open"] = true;
 
-    defConfig["menuElements"][4]["name"] = "Frequency Manager";
+    defConfig["menuElements"][4]["name"] = "频率管理器";
     defConfig["menuElements"][4]["open"] = true;
 
-    defConfig["menuElements"][5]["name"] = "VFO Color";
+    defConfig["menuElements"][5]["name"] = "VFO 颜色";
     defConfig["menuElements"][5]["open"] = true;
 
-    defConfig["menuElements"][6]["name"] = "Band Plan";
+    defConfig["menuElements"][6]["name"] = "频段规划";
     defConfig["menuElements"][6]["open"] = true;
 
-    defConfig["menuElements"][7]["name"] = "Display";
+    defConfig["menuElements"][7]["name"] = "显示设置";
     defConfig["menuElements"][7]["open"] = true;
+
+    defConfig["menuElements"][8]["name"] = "主题";
+    defConfig["menuElements"][8]["open"] = true;
+
+    defConfig["menuElements"][9]["name"] = "模块管理";
+    defConfig["menuElements"][9]["open"] = true;
 
     defConfig["menuWidth"] = 300;
     defConfig["min"] = -120.0;
@@ -217,9 +223,9 @@ int sdrpp_main(int argc, char* argv[]) {
 
     defConfig["moduleInstances"]["Radio"] = "radio";
 
-    defConfig["moduleInstances"]["Frequency Manager"] = "frequency_manager";
-    defConfig["moduleInstances"]["Recorder"] = "recorder";
-    defConfig["moduleInstances"]["Rigctl Server"] = "rigctl_server";
+    defConfig["moduleInstances"]["频率管理器"] = "frequency_manager";
+    defConfig["moduleInstances"]["录制器"] = "recorder";
+    defConfig["moduleInstances"]["Rigctl 服务器"] = "rigctl_server";
     // defConfig["moduleInstances"]["Rigctl Client"] = "rigctl_client";
     // TODO: Enable rigctl_client when ready
     // defConfig["moduleInstances"]["Scanner"] = "scanner";
@@ -243,7 +249,7 @@ int sdrpp_main(int argc, char* argv[]) {
     defConfig["offsets"]["Ku LNB (9750MHz)"] = -9750000000.0;
     defConfig["offsets"]["Ku LNB (10700MHz)"] = -10700000000.0;
 
-    defConfig["selectedOffset"] = "None";
+    defConfig["selectedOffset"] = "无";
     defConfig["manualOffset"] = 0.0;
     defConfig["showMenu"] = true;
     defConfig["showWaterfall"] = true;
@@ -253,7 +259,7 @@ int sdrpp_main(int argc, char* argv[]) {
     defConfig["invertIQ"] = false;
 
     defConfig["streams"]["Radio"]["muted"] = false;
-    defConfig["streams"]["Radio"]["sink"] = "Audio";
+    defConfig["streams"]["Radio"]["sink"] = "音频";
     defConfig["streams"]["Radio"]["volume"] = 1.0f;
 
     defConfig["windowSize"]["h"] = 720;

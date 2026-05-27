@@ -391,11 +391,11 @@ public:
 
         Pa_Initialize();
 
-        sigpath::sinkManager.registerSinkProvider("New Audio", provider);
+        sigpath::sinkManager.registerSinkProvider("新音频", provider);
     }
 
     ~AudioSinkModule() {
-        sigpath::sinkManager.unregisterSinkProvider("New Audio");
+        sigpath::sinkManager.unregisterSinkProvider("新音频");
         Pa_Terminate();
     }
 
