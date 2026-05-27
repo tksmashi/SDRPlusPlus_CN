@@ -148,7 +148,7 @@ private:
             }
         }
 
-        if (ImGui::Checkbox(CONCAT("Broken modulation##meteor_rec", _this->name), &_this->brokenModulation)) {
+        if (ImGui::Checkbox(CONCAT("断续调制##meteor_rec", _this->name), &_this->brokenModulation)) {
             _this->demod.setBrokenModulation(_this->brokenModulation);
             config.acquire();
             config.conf[_this->name]["brokenModulation"] = _this->brokenModulation;

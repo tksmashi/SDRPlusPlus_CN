@@ -70,7 +70,7 @@ M17LSF M17DecodeLSF(uint8_t* _lsf) {
 
     // Decode DST
     if (lsf.rawDst == 0) {
-        lsf.dst = "Invalid";
+        lsf.dst = "无效";
     }
     else if (lsf.rawDst <= 262143999999999) {
         char buf[128];
@@ -78,7 +78,7 @@ M17LSF M17DecodeLSF(uint8_t* _lsf) {
         lsf.dst = buf;
     }
     else if (lsf.rawDst == 0xFFFFFFFFFFFF) {
-        lsf.dst = "Broadcast";
+        lsf.dst = "广播";
     }
     else {
         char buf[128];
@@ -88,7 +88,7 @@ M17LSF M17DecodeLSF(uint8_t* _lsf) {
 
     // Decode SRC
     if (lsf.rawSrc == 0 || lsf.rawSrc == 0xFFFFFFFFFFFF) {
-        lsf.src = "Invalid";
+        lsf.src = "无效";
     }
     else if (lsf.rawSrc <= 262143999999999) {
         char buf[128];

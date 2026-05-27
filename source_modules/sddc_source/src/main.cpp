@@ -117,7 +117,7 @@ private:
         //     devices.define(devList[i].serial, name, devList[i].serial);
         // }
 
-        devices.define("0009072C00C40C32", "TESTING", "0009072C00C40C32");
+        devices.define("0009072C00C40C32", "测试", "0009072C00C40C32");
 
         // // Free the device list
         // sddc_free_device_list(devList);

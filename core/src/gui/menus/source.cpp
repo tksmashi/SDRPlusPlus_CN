@@ -242,7 +242,7 @@ namespace sourcemenu {
 
         float menuWidth = ImGui::GetContentRegionAvail().x;
 
-        const char* id = "Add offset##sdrpp_add_offset_dialog_";
+        const char* id = "添加偏移量##sdrpp_add_offset_dialog_";
         ImGui::OpenPopup(id);
 
         if (ImGui::BeginPopup(id, ImGuiWindowFlags_NoResize)) {
