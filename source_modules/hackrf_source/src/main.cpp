@@ -27,7 +27,7 @@ SDRPP_MOD_INFO{
 
 ConfigManager config;
 
-const char* AGG_MODES_STR = "Off\0Low\0High\0";
+const char* AGG_MODES_STR = "关闭\0低\0高\0";
 
 const char* sampleRatesTxt = "20MHz\00016MHz\00010MHz\0008MHz\0005MHz\0004MHz\0002MHz\000";
 
@@ -76,7 +76,7 @@ const char* bandwidthsTxt = "1.75MHz\0"
                             "20MHz\0"
                             "24MHz\0"
                             "28MHz\0"
-                            "Auto\0";
+                            "自动\0";
 
 class HackRFSourceModule : public ModuleManager::Instance {
 public:
@@ -321,7 +321,7 @@ private:
         SmGui::SameLine();
         SmGui::FillWidth();
         SmGui::ForceSync();
-        if (SmGui::Button(CONCAT("Refresh##_hackrf_refr_", _this->name))) {
+        if (SmGui::Button(CONCAT("刷新##_hackrf_refr_", _this->name))) {
             _this->refresh();
             _this->selectBySerial(_this->selectedSerial);
             core::setInputSampleRate(_this->sampleRate);
@@ -329,7 +329,7 @@ private:
 
         if (_this->running) { SmGui::EndDisabled(); }
 
-        SmGui::LeftLabel("Bandwidth");
+        SmGui::LeftLabel("带宽");
         SmGui::FillWidth();
         if (SmGui::Combo(CONCAT("##_hackrf_bw_sel_", _this->name), &_this->bwId, bandwidthsTxt)) {
             if (_this->running) {
@@ -340,7 +340,7 @@ private:
             config.release(true);
         }
 
-        SmGui::LeftLabel("LNA Gain");
+        SmGui::LeftLabel("LNA 增益");
         SmGui::FillWidth();
         if (SmGui::SliderFloatWithSteps(CONCAT("##_hackrf_lna_", _this->name), &_this->lna, 0, 40, 8, SmGui::FMT_STR_FLOAT_DB_NO_DECIMAL)) {
             if (_this->running) {
@@ -351,7 +351,7 @@ private:
             config.release(true);
         }
 
-        SmGui::LeftLabel("VGA Gain");
+        SmGui::LeftLabel("VGA 增益");
         SmGui::FillWidth();
         if (SmGui::SliderFloatWithSteps(CONCAT("##_hackrf_vga_", _this->name), &_this->vga, 0, 62, 2, SmGui::FMT_STR_FLOAT_DB_NO_DECIMAL)) {
             if (_this->running) {
@@ -371,7 +371,7 @@ private:
             config.release(true);
         }
 
-        if (SmGui::Checkbox(CONCAT("Amp Enabled##_hackrf_amp_", _this->name), &_this->amp)) {
+        if (SmGui::Checkbox(CONCAT("放大器启用##_hackrf_amp_", _this->name), &_this->amp)) {
             if (_this->running) {
                 hackrf_set_amp_enable(_this->openDev, _this->amp);
             }

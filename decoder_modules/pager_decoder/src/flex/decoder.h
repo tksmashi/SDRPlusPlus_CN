@@ -16,9 +16,9 @@ public:
         this->vfo = vfo;
 
         // Define baudrate options
-        baudrates.define(1600, "1600 Baud", 1600);
-        baudrates.define(3200, "3200 Baud", 3200);
-        baudrates.define(6400, "6400 Baud", 6400);
+        baudrates.define(1600, "1600 波特", 1600);
+        baudrates.define(3200, "3200 波特", 3200);
+        baudrates.define(6400, "6400 波特", 6400);
 
         // Init DSP
         vfo->setBandwidthLimits(12500, 12500, true);
@@ -33,7 +33,7 @@ public:
     }
 
     void showMenu() {
-        ImGui::LeftLabel("Baudrate");
+        ImGui::LeftLabel("波特率");
         ImGui::FillWidth();
         if (ImGui::Combo(("##pager_decoder_flex_br_" + name).c_str(), &brId, baudrates.txt)) {
             // TODO

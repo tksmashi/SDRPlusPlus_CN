@@ -360,7 +360,7 @@ private:
         SmGui::SameLine();
         SmGui::FillWidth();
         SmGui::ForceSync();
-        if (SmGui::Button(CONCAT("Refresh##_hydrasdr_refr_", _this->name))) {
+        if (SmGui::Button(CONCAT("刷新##_hydrasdr_refr_", _this->name))) {
             _this->refresh();
             config.acquire();
             std::string devSerial = config.conf["device"];
@@ -371,7 +371,7 @@ private:
 
         if (_this->running) { SmGui::EndDisabled(); }
 
-        SmGui::LeftLabel("Antenna Port");
+        SmGui::LeftLabel("天线端口");
         SmGui::FillWidth();
         if (SmGui::Combo(CONCAT("##_hydrasdr_port_", _this->name), &_this->portId, _this->ports.txt)) {
             if (_this->running) {
@@ -387,7 +387,7 @@ private:
         SmGui::BeginGroup();
         SmGui::Columns(3, CONCAT("HydraSDRGainModeColumns##_", _this->name), false);
         SmGui::ForceSync();
-        if (SmGui::RadioButton(CONCAT("Sensitive##_hydrasdr_gm_", _this->name), _this->gainMode == 0)) {
+        if (SmGui::RadioButton(CONCAT("灵敏##_hydrasdr_gm_", _this->name), _this->gainMode == 0)) {
             _this->gainMode = 0;
             if (_this->running) {
                 hydrasdr_set_lna_agc(_this->openDev, 0);
@@ -402,7 +402,7 @@ private:
         }
         SmGui::NextColumn();
         SmGui::ForceSync();
-        if (SmGui::RadioButton(CONCAT("Linear##_hydrasdr_gm_", _this->name), _this->gainMode == 1)) {
+        if (SmGui::RadioButton(CONCAT("线性##_hydrasdr_gm_", _this->name), _this->gainMode == 1)) {
             _this->gainMode = 1;
             if (_this->running) {
                 hydrasdr_set_lna_agc(_this->openDev, 0);
@@ -417,7 +417,7 @@ private:
         }
         SmGui::NextColumn();
         SmGui::ForceSync();
-        if (SmGui::RadioButton(CONCAT("Free##_hydrasdr_gm_", _this->name), _this->gainMode == 2)) {
+        if (SmGui::RadioButton(CONCAT("自由##_hydrasdr_gm_", _this->name), _this->gainMode == 2)) {
             _this->gainMode = 2;
             if (_this->running) {
                 if (_this->lnaAgc) {
@@ -448,7 +448,7 @@ private:
         // Gain menus
 
         if (_this->gainMode == 0) {
-            SmGui::LeftLabel("Gain");
+            SmGui::LeftLabel("增益");
             SmGui::FillWidth();
             if (SmGui::SliderInt(CONCAT("##_hydrasdr_sens_gain_", _this->name), &_this->sensitiveGain, 0, 21)) {
                 if (_this->running) {
@@ -462,7 +462,7 @@ private:
             }
         }
         else if (_this->gainMode == 1) {
-            SmGui::LeftLabel("Gain");
+            SmGui::LeftLabel("增益");
             SmGui::FillWidth();
             if (SmGui::SliderInt(CONCAT("##_hydrasdr_lin_gain_", _this->name), &_this->linearGain, 0, 21)) {
                 if (_this->running) {
@@ -478,7 +478,7 @@ private:
         else if (_this->gainMode == 2) {
             // TODO: Switch to a table for alignment
             if (_this->lnaAgc) { SmGui::BeginDisabled(); }
-            SmGui::LeftLabel("LNA Gain");
+            SmGui::LeftLabel("LNA 增益");
             SmGui::FillWidth();
             if (SmGui::SliderInt(CONCAT("##_hydrasdr_lna_gain_", _this->name), &_this->lnaGain, 0, 15)) {
                 if (_this->running) {
@@ -493,7 +493,7 @@ private:
             if (_this->lnaAgc) { SmGui::EndDisabled(); }
 
             if (_this->mixerAgc) { SmGui::BeginDisabled(); }
-            SmGui::LeftLabel("Mixer Gain");
+            SmGui::LeftLabel("混频器增益");
             SmGui::FillWidth();
             if (SmGui::SliderInt(CONCAT("##_hydrasdr_mix_gain_", _this->name), &_this->mixerGain, 0, 15)) {
                 if (_this->running) {
@@ -507,7 +507,7 @@ private:
             }
             if (_this->mixerAgc) { SmGui::EndDisabled(); }
 
-            SmGui::LeftLabel("VGA Gain");
+            SmGui::LeftLabel("VGA 增益");
             SmGui::FillWidth();
             if (SmGui::SliderInt(CONCAT("##_hydrasdr_vga_gain_", _this->name), &_this->vgaGain, 0, 15)) {
                 if (_this->running) {
@@ -539,7 +539,7 @@ private:
                 }
             }
             SmGui::ForceSync();
-            if (SmGui::Checkbox(CONCAT("Mixer AGC##_hydrasdr_", _this->name), &_this->mixerAgc)) {
+            if (SmGui::Checkbox(CONCAT("混频器 AGC##_hydrasdr_", _this->name), &_this->mixerAgc)) {
                 if (_this->running) {
                     if (_this->mixerAgc) {
                         hydrasdr_set_mixer_agc(_this->openDev, 1);
@@ -558,7 +558,7 @@ private:
         }
 
         // Bias T
-        if (SmGui::Checkbox(CONCAT("Bias T##_hydrasdr_", _this->name), &_this->biasT)) {
+        if (SmGui::Checkbox(CONCAT("Bias-T##_hydrasdr_", _this->name), &_this->biasT)) {
             if (_this->running) {
                 hydrasdr_set_rf_bias(_this->openDev, _this->biasT);
             }

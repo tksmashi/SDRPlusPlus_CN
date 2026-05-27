@@ -183,10 +183,10 @@ private:
         if (_this->running) { SmGui::BeginDisabled(); }
         SmGui::FillWidth();
         SmGui::ForceSync();
-        if (!connected && SmGui::Button("Connect##spyserver_source")) {
+        if (!connected && SmGui::Button("连接##spyserver_source")) {
             _this->tryConnect();
         }
-        else if (connected && SmGui::Button("Disconnect##spyserver_source")) {
+        else if (connected && SmGui::Button("断开##spyserver_source")) {
             _this->client->close();
         }
         if (_this->running) { SmGui::EndDisabled(); }
@@ -194,7 +194,7 @@ private:
 
         if (connected) {
             if (_this->running) { style::beginDisabled(); }
-            SmGui::LeftLabel("Samplerate");
+            SmGui::LeftLabel("采样率");
             SmGui::FillWidth();
             if (SmGui::Combo("##spyserver_source_sr", &_this->srId, _this->sampleRatesTxt.c_str())) {
                 _this->sampleRate = _this->sampleRates[_this->srId];
@@ -205,7 +205,7 @@ private:
             }
             if (_this->running) { style::endDisabled(); }
 
-            SmGui::LeftLabel("Sample bit depth");
+            SmGui::LeftLabel("采样位深");
             SmGui::FillWidth();
             if (SmGui::Combo("##spyserver_source_type", &_this->iqType, streamFormatStr)) {
                 int srvBits = streamFormatsBitCount[_this->iqType];
@@ -229,14 +229,14 @@ private:
                 }
             }
 
-            SmGui::Text("Status:");
+            SmGui::Text("状态:");
             SmGui::SameLine();
-            ImGui::TextColored(ImVec4(0.0f, 1.0f, 0.0f, 1.0f), "Connected (%s)", deviceTypesStr[_this->client->devInfo.DeviceType]);
+            ImGui::TextColored(ImVec4(0.0f, 1.0f, 0.0f, 1.0f), "已连接 (%s)", deviceTypesStr[_this->client->devInfo.DeviceType]);
         }
         else {
-            SmGui::Text("Status:");
+            SmGui::Text("状态:");
             SmGui::SameLine();
-            SmGui::Text("Not connected");
+            SmGui::Text("未连接");
         }
     }
 

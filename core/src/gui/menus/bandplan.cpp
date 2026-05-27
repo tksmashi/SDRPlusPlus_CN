@@ -9,7 +9,7 @@ namespace bandplanmenu {
     bool bandPlanEnabled;
     int bandPlanPos = 0;
 
-    const char* bandPlanPosTxt = "Bottom\0Top\0";
+    const char* bandPlanPosTxt = "底部\0顶部\0";
 
     void init() {
         // todo: check if the bandplan wasn't removed
@@ -45,7 +45,7 @@ namespace bandplanmenu {
         }
         ImGui::PopItemWidth();
 
-        ImGui::LeftLabel("Position");
+        ImGui::LeftLabel("位置");
         ImGui::SetNextItemWidth(menuColumnWidth - ImGui::GetCursorPosX());
         if (ImGui::Combo("##_bandplan_pos_", &bandPlanPos, bandPlanPosTxt)) {
             gui::waterfall.setBandPlanPos(bandPlanPos);
@@ -54,14 +54,14 @@ namespace bandplanmenu {
             core::configManager.release(true);
         }
 
-        if (ImGui::Checkbox("Enabled", &bandPlanEnabled)) {
+        if (ImGui::Checkbox("启用", &bandPlanEnabled)) {
             bandPlanEnabled ? gui::waterfall.showBandplan() : gui::waterfall.hideBandplan();
             core::configManager.acquire();
             core::configManager.conf["bandPlanEnabled"] = bandPlanEnabled;
             core::configManager.release(true);
         }
         bandplan::BandPlan_t plan = bandplan::bandplans[bandplan::bandplanNames[bandplanId]];
-        ImGui::Text("Country: %s (%s)", plan.countryName.c_str(), plan.countryCode.c_str());
-        ImGui::Text("Author: %s", plan.authorName.c_str());
+        ImGui::Text("国家: %s (%s)", plan.countryName.c_str(), plan.countryCode.c_str());
+        ImGui::Text("作者: %s", plan.authorName.c_str());
     }
 };

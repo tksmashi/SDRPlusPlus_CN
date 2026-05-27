@@ -50,7 +50,7 @@ public:
         strcpy(nameTemplate, "$t_$f_$h-$m-$s_$d-$M-$y");
 
         // Define the time zones
-        timezones.define("local", "Local", TIME_ZONE_LOCAL);
+        timezones.define("local", "本地", TIME_ZONE_LOCAL);
         timezones.define("utc", "UTC", TIME_ZONE_UTC);
 
         // Define option lists
@@ -246,14 +246,14 @@ private:
         if (_this->recording) { style::beginDisabled(); }
         ImGui::BeginGroup();
         ImGui::Columns(2, CONCAT("RecorderModeColumns##_", _this->name), false);
-        if (ImGui::RadioButton(CONCAT("Baseband##_recorder_mode_", _this->name), _this->recMode == RECORDER_MODE_BASEBAND)) {
+        if (ImGui::RadioButton(CONCAT("基带##_recorder_mode_", _this->name), _this->recMode == RECORDER_MODE_BASEBAND)) {
             _this->recMode = RECORDER_MODE_BASEBAND;
             config.acquire();
             config.conf[_this->name]["mode"] = _this->recMode;
             config.release(true);
         }
         ImGui::NextColumn();
-        if (ImGui::RadioButton(CONCAT("Audio##_recorder_mode_", _this->name), _this->recMode == RECORDER_MODE_AUDIO)) {
+        if (ImGui::RadioButton(CONCAT("音频##_recorder_mode_", _this->name), _this->recMode == RECORDER_MODE_AUDIO)) {
             _this->recMode = RECORDER_MODE_AUDIO;
             config.acquire();
             config.conf[_this->name]["mode"] = _this->recMode;
@@ -271,7 +271,7 @@ private:
             }
         }
 
-        ImGui::LeftLabel("Name template");
+        ImGui::LeftLabel("名称模板");
         ImGui::FillWidth();
         if (ImGui::InputText(CONCAT("##_recorder_name_template_", _this->name), _this->nameTemplate, 1023)) {
             config.acquire();
@@ -279,7 +279,7 @@ private:
             config.release(true);
         }
 
-        ImGui::LeftLabel("Time zone");
+        ImGui::LeftLabel("时区");
         ImGui::FillWidth();
         if (ImGui::Combo(CONCAT("##_recorder_timezone_", _this->name), &_this->timezoneId, _this->timezones.txt)) {
             config.acquire();
@@ -287,7 +287,7 @@ private:
             config.release(true);
         }
 
-        ImGui::LeftLabel("Container");
+        ImGui::LeftLabel("容器格式");
         ImGui::FillWidth();
         if (ImGui::Combo(CONCAT("##_recorder_container_", _this->name), &_this->containerId, _this->containers.txt)) {
             config.acquire();
@@ -295,7 +295,7 @@ private:
             config.release(true);
         }
 
-        ImGui::LeftLabel("Sample type");
+        ImGui::LeftLabel("采样类型");
         ImGui::FillWidth();
         if (ImGui::Combo(CONCAT("##_recorder_st_", _this->name), &_this->sampleTypeId, _this->sampleTypes.txt)) {
             config.acquire();
@@ -308,7 +308,7 @@ private:
         // Show additional audio options
         if (_this->recMode == RECORDER_MODE_AUDIO) {
             if (_this->recording) { style::beginDisabled(); }
-            ImGui::LeftLabel("Stream");
+            ImGui::LeftLabel("音频流");
             ImGui::FillWidth();
             if (ImGui::Combo(CONCAT("##_recorder_stream_", _this->name), &_this->streamId, _this->audioStreams.txt)) {
                 _this->selectStream(_this->audioStreams.value(_this->streamId));
@@ -333,14 +333,14 @@ private:
             }
 
             if (_this->recording) { style::beginDisabled(); }
-            if (ImGui::Checkbox(CONCAT("Stereo##_recorder_stereo_", _this->name), &_this->stereo)) {
+            if (ImGui::Checkbox(CONCAT("立体声##_recorder_stereo_", _this->name), &_this->stereo)) {
                 config.acquire();
                 config.conf[_this->name]["stereo"] = _this->stereo;
                 config.release(true);
             }
             if (_this->recording) { style::endDisabled(); }
 
-            if (ImGui::Checkbox(CONCAT("Ignore silence##_recorder_ignore_silence_", _this->name), &_this->ignoreSilence)) {
+            if (ImGui::Checkbox(CONCAT("静音时暂停##_recorder_ignore_silence_", _this->name), &_this->ignoreSilence)) {
                 config.acquire();
                 config.conf[_this->name]["ignoreSilence"] = _this->ignoreSilence;
                 config.release(true);
@@ -351,13 +351,13 @@ private:
         bool canRecord = _this->folderSelect.pathIsValid();
         if (_this->recMode == RECORDER_MODE_AUDIO) { canRecord &= !_this->selectedStreamName.empty(); }
         if (!_this->recording) {
-            if (ImGui::Button(CONCAT("Record##_recorder_rec_", _this->name), ImVec2(menuWidth, 0))) {
+            if (ImGui::Button(CONCAT("录制##_recorder_rec_", _this->name), ImVec2(menuWidth, 0))) {
                 _this->start();
             }
-            ImGui::TextColored(ImGui::GetStyleColorVec4(ImGuiCol_Text), "Idle --:--:--");
+            ImGui::TextColored(ImGui::GetStyleColorVec4(ImGuiCol_Text), "空闲 --:--:--");
         }
         else {
-            if (ImGui::Button(CONCAT("Stop##_recorder_rec_", _this->name), ImVec2(menuWidth, 0))) {
+            if (ImGui::Button(CONCAT("停止##_recorder_rec_", _this->name), ImVec2(menuWidth, 0))) {
                 _this->stop();
             }
             uint64_t seconds = _this->writer.getSamplesWritten() / _this->samplerate;
@@ -365,10 +365,10 @@ private:
             tm* dtm = gmtime(&diff);
 
             if (_this->ignoreSilence && _this->ignoringSilence) {
-                ImGui::TextColored(ImVec4(1.0f, 1.0f, 0.0f, 1.0f), "Paused %02d:%02d:%02d", dtm->tm_hour, dtm->tm_min, dtm->tm_sec);
+                ImGui::TextColored(ImVec4(1.0f, 1.0f, 0.0f, 1.0f), "已暂停 %02d:%02d:%02d", dtm->tm_hour, dtm->tm_min, dtm->tm_sec);
             }
             else {
-                ImGui::TextColored(ImVec4(1.0f, 0.0f, 0.0f, 1.0f), "Recording %02d:%02d:%02d", dtm->tm_hour, dtm->tm_min, dtm->tm_sec);
+                ImGui::TextColored(ImVec4(1.0f, 0.0f, 0.0f, 1.0f), "录制中 %02d:%02d:%02d", dtm->tm_hour, dtm->tm_min, dtm->tm_sec);
             }
         }
     }

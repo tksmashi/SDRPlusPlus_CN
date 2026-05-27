@@ -389,7 +389,7 @@ private:
         if (_this->devId < 0) {
             SmGui::FillWidth();
             SmGui::ForceSync();
-            if (SmGui::Button(CONCAT("Refresh##_dev_select_", _this->name))) {
+            if (SmGui::Button(CONCAT("刷新##_dev_select_", _this->name))) {
                 _this->refresh();
                 _this->selectDevice(config.conf["device"]);
             }
@@ -416,7 +416,7 @@ private:
 
         SmGui::SameLine();
         SmGui::FillWidth();
-        if (SmGui::Button(CONCAT("Refresh##_dev_select_", _this->name))) {
+        if (SmGui::Button(CONCAT("刷新##_dev_select_", _this->name))) {
             _this->refresh();
             _this->selectDevice(config.conf["device"]);
         }
@@ -424,7 +424,7 @@ private:
         if (_this->running) { SmGui::EndDisabled(); }
 
         if (_this->antennaList.size() > 1) {
-            SmGui::LeftLabel("Antenna");
+            SmGui::LeftLabel("天线");
             SmGui::FillWidth();
             if (SmGui::Combo(CONCAT("##_antenna_select_", _this->name), &_this->uiAntennaId, _this->txtAntennaList.c_str())) {
                 if (_this->running)
@@ -461,7 +461,7 @@ private:
         int i = 0;
         char buf[128];
         for (auto gain : _this->gainList) {
-            sprintf(buf, "%s gain", gain.c_str());
+            sprintf(buf, "%s 增益", gain.c_str());
             SmGui::LeftLabel(buf);
             // ImGui::SetCursorPosX(gainNameLen);
             // ImGui::SetNextItemWidth(menuWidth - gainNameLen);
@@ -483,7 +483,7 @@ private:
             i++;
         }
         if (_this->bandwidthList.size() > 2) {
-            SmGui::LeftLabel("Bandwidth");
+            SmGui::LeftLabel("带宽");
             SmGui::FillWidth();
             if (SmGui::Combo(CONCAT("##_bw_select_", _this->name), &_this->uiBandwidthId, _this->txtBwList.c_str())) {
                 if (_this->running) {

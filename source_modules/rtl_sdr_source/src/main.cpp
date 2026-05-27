@@ -52,7 +52,7 @@ const char* sampleRatesTxt[] = {
     "3.2MHz"
 };
 
-const char* directSamplingModesTxt = "Disabled\0I branch\0Q branch\0";
+const char* directSamplingModesTxt = "已禁用\0I 分支\0Q 分支\0";
 
 class RTLSDRSourceModule : public ModuleManager::Instance {
 public:
@@ -387,7 +387,7 @@ private:
         SmGui::SameLine();
         SmGui::FillWidth();
         SmGui::ForceSync();
-        if (SmGui::Button(CONCAT("Refresh##_rtlsdr_refr_", _this->name)/*, ImVec2(refreshBtnWdith, 0)*/)) {
+        if (SmGui::Button(CONCAT("刷新##_rtlsdr_refr_", _this->name)/*, ImVec2(refreshBtnWdith, 0)*/)) {
             _this->refresh();
             _this->selectByName(_this->selectedDevName);
             core::setInputSampleRate(_this->sampleRate);
@@ -396,7 +396,7 @@ private:
         if (_this->running) { SmGui::EndDisabled(); }
 
         // Rest of rtlsdr config here
-        SmGui::LeftLabel("Direct Sampling");
+        SmGui::LeftLabel("直接采样");
         SmGui::FillWidth();
         if (SmGui::Combo(CONCAT("##_rtlsdr_ds_", _this->name), &_this->directSamplingMode, directSamplingModesTxt)) {
             if (_this->running) {
@@ -421,7 +421,7 @@ private:
             }
         }
 
-        SmGui::LeftLabel("PPM Correction");
+        SmGui::LeftLabel("PPM 校正");
         SmGui::FillWidth();
         if (SmGui::InputInt(CONCAT("##_rtlsdr_ppm_", _this->name), &_this->ppm, 1, 10)) {
             _this->ppm = std::clamp<int>(_this->ppm, -1000000, 1000000);
@@ -437,7 +437,7 @@ private:
 
         if (_this->tunerAgc || _this->gainList.size() == 0) { SmGui::BeginDisabled(); }
 
-        SmGui::LeftLabel("Gain");
+        SmGui::LeftLabel("增益");
         SmGui::FillWidth();
         SmGui::ForceSync();
         // TODO: FIND ANOTHER WAY
@@ -471,7 +471,7 @@ private:
         
         if (_this->tunerAgc || _this->gainList.size() == 0) { SmGui::EndDisabled(); }
 
-        if (SmGui::Checkbox(CONCAT("Bias T##_rtlsdr_rtl_biast_", _this->name), &_this->biasT)) {
+        if (SmGui::Checkbox(CONCAT("Bias-T##_rtlsdr_rtl_biast_", _this->name), &_this->biasT)) {
             if (_this->running) {
                 rtlsdr_set_bias_tee(_this->openDev, _this->biasT);
             }
@@ -482,7 +482,7 @@ private:
             }
         }
 
-        if (SmGui::Checkbox(CONCAT("Offset Tuning##_rtlsdr_rtl_ofs_", _this->name), &_this->offsetTuning)) {
+        if (SmGui::Checkbox(CONCAT("偏移调谐##_rtlsdr_rtl_ofs_", _this->name), &_this->offsetTuning)) {
             if (_this->running) {
                 rtlsdr_set_offset_tuning(_this->openDev, _this->offsetTuning);
             }
@@ -505,7 +505,7 @@ private:
         }
 
         SmGui::ForceSync();
-        if (SmGui::Checkbox(CONCAT("Tuner AGC##_rtlsdr_tuner_agc_", _this->name), &_this->tunerAgc)) {
+        if (SmGui::Checkbox(CONCAT("调谐器 AGC##_rtlsdr_tuner_agc_", _this->name), &_this->tunerAgc)) {
             if (_this->running) {
                 if (_this->tunerAgc) {
                     rtlsdr_set_tuner_gain_mode(_this->openDev, 0);

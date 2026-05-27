@@ -12,17 +12,17 @@ bool M17CheckCRC(uint8_t* data, int len) {
 }
 
 const char* M17DataTypesTxt[4] = {
-    "Unknown",
-    "Data",
-    "Voice",
-    "Voice & Data"
+    "未知",
+    "数据",
+    "语音",
+    "语音和数据"
 };
 
 const char* M17EncryptionTypesTxt[4] = {
-    "None",
+    "无",
     "AES",
-    "Scrambler",
-    "Unknown"
+    "加扰",
+    "未知"
 };
 
 M17LSF M17DecodeLSF(uint8_t* _lsf) {

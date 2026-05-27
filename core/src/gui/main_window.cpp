@@ -29,7 +29,7 @@
 #include <gui/tuner.h>
 
 void MainWindow::init() {
-    LoadingScreen::show("Initializing UI");
+    LoadingScreen::show("正在初始化界面");
     gui::waterfall.init();
     gui::waterfall.setRawFFTSize(fftSize);
 
@@ -70,13 +70,13 @@ void MainWindow::init() {
         gui::menu.order.push_back(opt);
     }
 
-    gui::menu.registerEntry("Source", sourcemenu::draw, NULL);
-    gui::menu.registerEntry("Sinks", sinkmenu::draw, NULL);
-    gui::menu.registerEntry("Band Plan", bandplanmenu::draw, NULL);
-    gui::menu.registerEntry("Display", displaymenu::draw, NULL);
-    gui::menu.registerEntry("Theme", thememenu::draw, NULL);
-    gui::menu.registerEntry("VFO Color", vfo_color_menu::draw, NULL);
-    gui::menu.registerEntry("Module Manager", module_manager_menu::draw, NULL);
+    gui::menu.registerEntry("信号源", sourcemenu::draw, NULL);
+    gui::menu.registerEntry("音频输出", sinkmenu::draw, NULL);
+    gui::menu.registerEntry("频段规划", bandplanmenu::draw, NULL);
+    gui::menu.registerEntry("显示设置", displaymenu::draw, NULL);
+    gui::menu.registerEntry("主题", thememenu::draw, NULL);
+    gui::menu.registerEntry("VFO 颜色", vfo_color_menu::draw, NULL);
+    gui::menu.registerEntry("模块管理", module_manager_menu::draw, NULL);
 
     gui::freqSelect.init();
 
@@ -143,7 +143,7 @@ void MainWindow::init() {
     }
 
     // Load color maps
-    LoadingScreen::show("Loading color maps");
+    LoadingScreen::show("正在加载色彩图");
     flog::info("Loading color maps");
     if (std::filesystem::is_directory(resourcesDir + "/colormaps")) {
         for (const auto& file : std::filesystem::directory_iterator(resourcesDir + "/colormaps")) {
@@ -174,7 +174,7 @@ void MainWindow::init() {
     // Fix gain not updated on startup, soapysdr
 
     // Update UI settings
-    LoadingScreen::show("Loading configuration");
+    LoadingScreen::show("正在加载配置");
     core::configManager.acquire();
     fftMin = core::configManager.conf["min"];
     fftMax = core::configManager.conf["max"];
@@ -501,29 +501,29 @@ void MainWindow::draw() {
             firstMenuRender = false;
         }
 
-        if (ImGui::CollapsingHeader("Debug")) {
-            ImGui::Text("Frame time: %.3f ms/frame", ImGui::GetIO().DeltaTime * 1000.0f);
-            ImGui::Text("Framerate: %.1f FPS", ImGui::GetIO().Framerate);
-            ImGui::Text("Center Frequency: %.0f Hz", gui::waterfall.getCenterFrequency());
-            ImGui::Text("Source name: %s", sourceName.c_str());
-            ImGui::Checkbox("Show demo window", &demoWindow);
-            ImGui::Text("ImGui version: %s", ImGui::GetVersion());
+        if (ImGui::CollapsingHeader("调试")) {
+            ImGui::Text("帧时间: %.3f ms/帧", ImGui::GetIO().DeltaTime * 1000.0f);
+            ImGui::Text("帧率: %.1f FPS", ImGui::GetIO().Framerate);
+            ImGui::Text("中心频率: %.0f Hz", gui::waterfall.getCenterFrequency());
+            ImGui::Text("信号源名称: %s", sourceName.c_str());
+            ImGui::Checkbox("显示演示窗口", &demoWindow);
+            ImGui::Text("ImGui 版本: %s", ImGui::GetVersion());
 
             // ImGui::Checkbox("Bypass buffering", &sigpath::iqFrontEnd.inputBuffer.bypass);
 
             // ImGui::Text("Buffering: %d", (sigpath::iqFrontEnd.inputBuffer.writeCur - sigpath::iqFrontEnd.inputBuffer.readCur + 32) % 32);
 
-            if (ImGui::Button("Test Bug")) {
+            if (ImGui::Button("测试 Bug")) {
                 flog::error("Will this make the software crash?");
             }
 
-            if (ImGui::Button("Testing something")) {
+            if (ImGui::Button("测试功能")) {
                 gui::menu.order[0].open = true;
                 firstMenuRender = true;
             }
 
-            ImGui::Checkbox("WF Single Click", &gui::waterfall.VFOMoveSingleClick);
-            ImGui::Checkbox("Lock Menu Order", &gui::menu.locked);
+            ImGui::Checkbox("WF 单击模式", &gui::waterfall.VFOMoveSingleClick);
+            ImGui::Checkbox("锁定菜单顺序", &gui::menu.locked);
 
             ImGui::Spacing();
         }
@@ -612,8 +612,8 @@ void MainWindow::draw() {
     ImGui::NextColumn();
     ImGui::BeginChild("WaterfallControls");
 
-    ImGui::SetCursorPosX((ImGui::GetWindowSize().x / 2.0) - (ImGui::CalcTextSize("Zoom").x / 2.0));
-    ImGui::TextUnformatted("Zoom");
+    ImGui::SetCursorPosX((ImGui::GetWindowSize().x / 2.0) - (ImGui::CalcTextSize("缩放").x / 2.0));
+    ImGui::TextUnformatted("缩放");
     ImGui::SetCursorPosX((ImGui::GetWindowSize().x / 2.0) - 10 * style::uiScale);
     ImVec2 wfSliderSize(20.0 * style::uiScale, 150.0 * style::uiScale);
     if (ImGui::VSliderFloat("##_7_", wfSliderSize, &bw, 1.0, 0.0, "")) {
@@ -632,8 +632,8 @@ void MainWindow::draw() {
 
     ImGui::NewLine();
 
-    ImGui::SetCursorPosX((ImGui::GetWindowSize().x / 2.0) - (ImGui::CalcTextSize("Max").x / 2.0));
-    ImGui::TextUnformatted("Max");
+    ImGui::SetCursorPosX((ImGui::GetWindowSize().x / 2.0) - (ImGui::CalcTextSize("最大").x / 2.0));
+    ImGui::TextUnformatted("最大");
     ImGui::SetCursorPosX((ImGui::GetWindowSize().x / 2.0) - 10 * style::uiScale);
     if (ImGui::VSliderFloat("##_8_", wfSliderSize, &fftMax, 0.0, -160.0f, "")) {
         fftMax = std::max<float>(fftMax, fftMin + 10);
@@ -644,8 +644,8 @@ void MainWindow::draw() {
 
     ImGui::NewLine();
 
-    ImGui::SetCursorPosX((ImGui::GetWindowSize().x / 2.0) - (ImGui::CalcTextSize("Min").x / 2.0));
-    ImGui::TextUnformatted("Min");
+    ImGui::SetCursorPosX((ImGui::GetWindowSize().x / 2.0) - (ImGui::CalcTextSize("最小").x / 2.0));
+    ImGui::TextUnformatted("最小");
     ImGui::SetCursorPosX((ImGui::GetWindowSize().x / 2.0) - 10 * style::uiScale);
     ImGui::SetItemUsingMouseWheel();
     if (ImGui::VSliderFloat("##_9_", wfSliderSize, &fftMin, 0.0, -160.0f, "")) {

@@ -219,7 +219,7 @@ private:
         SmGui::SameLine();
         SmGui::FillWidth();
         SmGui::ForceSync();
-        if (SmGui::Button(CONCAT("Refresh##_hermes_refr_", _this->name))) {
+        if (SmGui::Button(CONCAT("刷新##_hermes_refr_", _this->name))) {
             _this->refresh();
             config.acquire();
             std::string mac = config.conf["device"];
@@ -232,7 +232,7 @@ private:
 
         // TODO: Device parameters
 
-        SmGui::LeftLabel("LNA Gain");
+        SmGui::LeftLabel("LNA 增益");
         SmGui::FillWidth();
         if (SmGui::SliderInt("##hermes_source_lna_gain", &_this->gain, 0, 60)) {
             if (_this->running) {

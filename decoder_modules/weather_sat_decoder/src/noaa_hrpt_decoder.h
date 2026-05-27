@@ -283,7 +283,7 @@ public:
             ImGui::End();
         }
 
-        ImGui::Checkbox("Show Image", &showWindow);
+        ImGui::Checkbox("显示图像", &showWindow);
     };
 
 private:

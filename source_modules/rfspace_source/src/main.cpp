@@ -148,7 +148,7 @@ private:
         if (_this->running) { SmGui::BeginDisabled(); }
         SmGui::FillWidth();
         SmGui::ForceSync();
-        if (!connected && SmGui::Button("Connect##rfspace_source")) {
+        if (!connected && SmGui::Button("连接##rfspace_source")) {
             try {
                 if (_this->client) { _this->client.reset(); }
                 _this->client = rfspace::connect(_this->hostname, _this->port, &_this->stream);
@@ -158,7 +158,7 @@ private:
                 flog::error("Could not connect to SDR: {}", e.what());
             }
         }
-        else if (connected && SmGui::Button("Disconnect##rfspace_source")) {
+        else if (connected && SmGui::Button("断开##rfspace_source")) {
             _this->client->close();
         }
         if (_this->running) { SmGui::EndDisabled(); }
@@ -167,7 +167,7 @@ private:
         if (connected) {
             if (_this->running) { SmGui::BeginDisabled(); }
 
-            SmGui::LeftLabel("Samplerate");
+            SmGui::LeftLabel("采样率");
             SmGui::FillWidth();
             if (SmGui::Combo("##rfspace_source_samp_rate", &_this->srId, _this->sampleRates.txt)) {
                 _this->sampleRate = _this->sampleRates[_this->srId];
@@ -182,7 +182,7 @@ private:
             if (_this->running) { SmGui::EndDisabled(); }
 
             if (_this->client->deviceId == rfspace::RFSPACE_DEV_ID_CLOUD_IQ) {
-                SmGui::LeftLabel("Antenna Port");
+                SmGui::LeftLabel("天线端口");
                 SmGui::FillWidth();
                 if (SmGui::Combo("##rfspace_source_rf_port", &_this->rfPortId, _this->rfPorts.txt)) {
                     _this->client->setPort(_this->rfPorts[_this->rfPortId]);
@@ -193,7 +193,7 @@ private:
                 }
             }
 
-            SmGui::LeftLabel("Gain");
+            SmGui::LeftLabel("增益");
             SmGui::FillWidth();
             if (SmGui::SliderFloatWithSteps("##rfspace_source_gain", &_this->gain, -30, 0, 10, SmGui::FMT_STR_FLOAT_DB_NO_DECIMAL)) {
                 _this->client->setGain(_this->gain);
@@ -203,14 +203,14 @@ private:
                 config.release(true);
             }
 
-            SmGui::Text("Status:");
+            SmGui::Text("状态:");
             SmGui::SameLine();
             SmGui::TextColored(ImVec4(0.0f, 1.0f, 0.0f, 1.0f), _this->connectedStr.c_str());
         }
         else {
-            SmGui::Text("Status:");
+            SmGui::Text("状态:");
             SmGui::SameLine();
-            SmGui::Text("Not connected");
+            SmGui::Text("未连接");
         }
     }
 
@@ -219,7 +219,7 @@ private:
         char buf[4096];
         sprintf(buf, "%s:%05d", hostname, port);
         devConfName = buf;
-        sprintf(buf, "Connected (%s:%05d)", hostname, port);
+        sprintf(buf, "已连接 (%s:%05d)", hostname, port);
         connectedStr = buf;
 
         // Get device name
@@ -239,9 +239,9 @@ private:
         
         // Create RF port list
         rfPorts.clear();
-        rfPorts.define("Port 1", rfspace::RFSPACE_RF_PORT_1);
+                rfPorts.define("端口 1", rfspace::RFSPACE_RF_PORT_1);
         if (client->deviceId == rfspace::RFSPACE_DEV_ID_CLOUD_IQ) {
-            rfPorts.define("Port 2", rfspace::RFSPACE_RF_PORT_2);
+            rfPorts.define("端口 2", rfspace::RFSPACE_RF_PORT_2);
         }
 
         // Load config

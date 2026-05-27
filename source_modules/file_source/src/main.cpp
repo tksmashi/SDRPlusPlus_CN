@@ -148,7 +148,7 @@ private:
             }
         }
 
-        ImGui::Checkbox("Float32 Mode##_file_source", &_this->float32Mode);
+        ImGui::Checkbox("Float32 模式##_file_source", &_this->float32Mode);
     }
 
     static void worker(void* ctx) {

@@ -25,7 +25,7 @@ SDRPP_MOD_INFO{
 
 ConfigManager config;
 
-const char* AGG_MODES_STR = "Off\0Low\0High\0";
+const char* AGG_MODES_STR = "关闭\0低\0高\0";
 
 class AirspyHFSourceModule : public ModuleManager::Instance {
 public:
@@ -319,7 +319,7 @@ private:
         SmGui::SameLine();
         SmGui::FillWidth();
         SmGui::ForceSync();
-        if (SmGui::Button(CONCAT("Refresh##_airspyhf_refr_", _this->name))) {
+        if (SmGui::Button(CONCAT("刷新##_airspyhf_refr_", _this->name))) {
             _this->refresh();
             config.acquire();
             std::string devSerial = config.conf["device"];
@@ -330,7 +330,7 @@ private:
 
         if (_this->running) { SmGui::EndDisabled(); }
 
-        SmGui::LeftLabel("AGC Mode");
+        SmGui::LeftLabel("AGC 模式");
         SmGui::FillWidth();
         if (SmGui::Combo(CONCAT("##_airspyhf_agc_", _this->name), &_this->agcMode, AGG_MODES_STR)) {
             if (_this->running) {
@@ -346,7 +346,7 @@ private:
             }
         }
 
-        SmGui::LeftLabel("Attenuation");
+        SmGui::LeftLabel("衰减");
         SmGui::FillWidth();
         if (SmGui::SliderFloatWithSteps(CONCAT("##_airspyhf_attn_", _this->name), &_this->atten, 0, 48, 6, SmGui::FMT_STR_FLOAT_DB_NO_DECIMAL)) {
             if (_this->running) {

@@ -40,13 +40,13 @@ namespace demod {
 
         void showMenu() {
             float menuWidth = ImGui::GetContentRegionAvail().x;
-            if (ImGui::Checkbox(("Carrier AGC##_radio_am_carrier_agc_" + name).c_str(), &carrierAgc)) {
+            if (ImGui::Checkbox(("载波 AGC##_radio_am_carrier_agc_" + name).c_str(), &carrierAgc)) {
                 demod.setAGCMode(carrierAgc ? dsp::demod::AM<dsp::stereo_t>::AGCMode::CARRIER : dsp::demod::AM<dsp::stereo_t>::AGCMode::AUDIO);
                 _config->acquire();
                 _config->conf[name][getName()]["carrierAgc"] = carrierAgc;
                 _config->release(true);
             }
-            ImGui::LeftLabel("AGC Attack");
+            ImGui::LeftLabel("AGC 攻击");
             ImGui::SetNextItemWidth(menuWidth - ImGui::GetCursorPosX());
             if (ImGui::SliderFloat(("##_radio_am_agc_attack_" + name).c_str(), &agcAttack, 1.0f, 200.0f)) {
                 demod.setAGCAttack(agcAttack / getIFSampleRate());
@@ -54,7 +54,7 @@ namespace demod {
                 _config->conf[name][getName()]["agcAttack"] = agcAttack;
                 _config->release(true);
             }
-            ImGui::LeftLabel("AGC Decay");
+            ImGui::LeftLabel("AGC 衰减");
             ImGui::SetNextItemWidth(menuWidth - ImGui::GetCursorPosX());
             if (ImGui::SliderFloat(("##_radio_am_agc_decay_" + name).c_str(), &agcDecay, 1.0f, 20.0f)) {
                 demod.setAGCDecay(agcDecay / getIFSampleRate());

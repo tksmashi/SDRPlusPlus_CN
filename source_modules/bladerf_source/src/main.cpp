@@ -39,8 +39,8 @@ public:
         this->name = name;
 
         // Define clocks
-        clocks.define("onboard", "On-Board", CLOCK_SELECT_ONBOARD);
-        clocks.define("external", "External", CLOCK_SELECT_EXTERNAL);
+        clocks.define("onboard", "板载", CLOCK_SELECT_ONBOARD);
+        clocks.define("external", "外部", CLOCK_SELECT_EXTERNAL);
 
         sampleRate = 1000000.0;
 
@@ -206,7 +206,7 @@ public:
         bandwidths.push_back(bwRange->max);
         bandwidthsTxt += getBandwdithScaled(bwRange->max);
         bandwidthsTxt += '\0';
-        bandwidthsTxt += "Auto";
+        bandwidthsTxt += "自动";
         bandwidthsTxt += '\0';
 
         // Generate list of channel names
@@ -468,7 +468,7 @@ private:
         SmGui::SameLine();
         SmGui::FillWidth();
         SmGui::ForceSync();
-        if (SmGui::Button(CONCAT("Refresh##_balderf_refr_", _this->name))) {
+        if (SmGui::Button(CONCAT("刷新##_balderf_refr_", _this->name))) {
             _this->refresh();
             _this->selectBySerial(_this->selectedSerial, false);
             core::setInputSampleRate(_this->sampleRate);
@@ -476,7 +476,7 @@ private:
 
         // Channel selection (only show if more than one channel)
         if (_this->channelCount > 1) {
-            SmGui::LeftLabel("RX Channel");
+            SmGui::LeftLabel("接收通道");
             SmGui::FillWidth();
             SmGui::Combo(CONCAT("##_balderf_ch_sel_", _this->name), &_this->chanId, _this->channelNamesTxt.c_str());
             if (_this->selectedSerial != "") {
@@ -488,7 +488,7 @@ private:
 
         if (_this->running) { SmGui::EndDisabled(); }
 
-        SmGui::LeftLabel("Bandwidth");
+        SmGui::LeftLabel("带宽");
         SmGui::FillWidth();
         if (SmGui::Combo(CONCAT("##_balderf_bw_sel_", _this->name), &_this->bwId, _this->bandwidthsTxt.c_str())) {
             if (_this->running) {
@@ -501,7 +501,7 @@ private:
             }
         }
 
-        SmGui::LeftLabel("Clock Source");
+        SmGui::LeftLabel("时钟源");
         SmGui::FillWidth();
         if (SmGui::Combo(CONCAT("##_balderf_clk_sel_", _this->name), &_this->clkId, _this->clocks.txt)) {
             if (_this->running) {
@@ -515,7 +515,7 @@ private:
         }
 
         // General config BS
-        SmGui::LeftLabel("Gain control mode");
+        SmGui::LeftLabel("增益控制模式");
         SmGui::FillWidth();
         SmGui::ForceSync();
         if (SmGui::Combo(CONCAT("##_balderf_gm_sel_", _this->name), &_this->gainMode, _this->gainModesTxt.c_str()) && _this->selectedSerial != "") {
@@ -536,7 +536,7 @@ private:
         if (_this->selectedSerial != "") {
             if (_this->gainModes[_this->gainMode].mode != BLADERF_GAIN_MANUAL) { SmGui::BeginDisabled(); }
         }
-        SmGui::LeftLabel("Gain");
+        SmGui::LeftLabel("增益");
         SmGui::FillWidth();
         if (SmGui::SliderInt("##_balderf_oag_sel_", &_this->overallGain, (_this->gainRange != NULL) ? _this->gainRange->min : 0, (_this->gainRange != NULL) ? _this->gainRange->max : 60)) {
             if (_this->running) {

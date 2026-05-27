@@ -150,7 +150,7 @@ private:
         gui::mainWindow.playButtonLocked = !connected;
 
         ImGui::GenericDialog("##sdrpp_srv_src_err_dialog", _this->serverBusy, GENERIC_DIALOG_BUTTONS_OK, [=](){
-            ImGui::TextUnformatted("This server is already in use.");
+            ImGui::TextUnformatted("该服务器已被占用。");
         });
 
         if (connected) { style::beginDisabled(); }
@@ -169,17 +169,17 @@ private:
         if (connected) { style::endDisabled(); }
 
         if (_this->running) { style::beginDisabled(); }
-        if (!connected && ImGui::Button("Connect##sdrpp_srv_source", ImVec2(menuWidth, 0))) {
+        if (!connected && ImGui::Button("连接##sdrpp_srv_source", ImVec2(menuWidth, 0))) {
             _this->tryConnect();
         }
-        else if (connected && ImGui::Button("Disconnect##sdrpp_srv_source", ImVec2(menuWidth, 0))) {
+        else if (connected && ImGui::Button("断开##sdrpp_srv_source", ImVec2(menuWidth, 0))) {
             _this->client->close();
         }
         if (_this->running) { style::endDisabled(); }
 
 
         if (connected) {
-            ImGui::LeftLabel("Sample type");
+            ImGui::LeftLabel("采样类型");
             ImGui::FillWidth();
             if (ImGui::Combo("##sdrpp_srv_source_samp_type", &_this->sampleTypeId, _this->sampleTypeList.txt)) {
                 _this->client->setSampleType(_this->sampleTypeList[_this->sampleTypeId]);
@@ -190,7 +190,7 @@ private:
                 config.release(true);
             }
             
-            if (ImGui::Checkbox("Compression", &_this->compression)) {
+            if (ImGui::Checkbox("压缩", &_this->compression)) {
                 _this->client->setCompression(_this->compression);
 
                 // Save config
@@ -201,7 +201,7 @@ private:
 
             bool dummy = true;
             style::beginDisabled();
-            ImGui::Checkbox("Full IQ", &dummy);
+            ImGui::Checkbox("完整 IQ", &dummy);
             style::endDisabled();
 
             // Calculate datarate
@@ -212,18 +212,18 @@ private:
                 _this->client->bytes = 0;
             }
 
-            ImGui::TextUnformatted("Status:");
+            ImGui::TextUnformatted("状态:");
             ImGui::SameLine();
-            ImGui::TextColored(ImVec4(0.0f, 1.0f, 0.0f, 1.0f), "Connected (%.3f Mbit/s)", _this->datarate);
+            ImGui::TextColored(ImVec4(0.0f, 1.0f, 0.0f, 1.0f), "已连接 (%.3f Mbit/s)", _this->datarate);
 
-            ImGui::CollapsingHeader("Source [REMOTE]", ImGuiTreeNodeFlags_DefaultOpen);
+            ImGui::CollapsingHeader("信号源 [远程]", ImGuiTreeNodeFlags_DefaultOpen);
 
             _this->client->showMenu();
         }
         else {
-            ImGui::TextUnformatted("Status:");
+            ImGui::TextUnformatted("状态:");
             ImGui::SameLine();
-            ImGui::TextUnformatted("Not connected (--.--- Mbit/s)");
+            ImGui::TextUnformatted("未连接 (--.--- Mbit/s)");
         }
     }
 
