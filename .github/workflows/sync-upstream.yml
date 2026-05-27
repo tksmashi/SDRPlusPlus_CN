@@ -1,0 +1,171 @@
+name: Sync Upstream
+
+on:
+    schedule:
+        - cron: '0 6 * * *'  # 每日 UTC 6:00 (北京时间 14:00)
+    workflow_dispatch:
+
+permissions:
+    contents: write
+    issues: write
+
+jobs:
+    sync:
+        runs-on: ubuntu-latest
+
+        steps:
+            - uses: actions/checkout@v4
+              with:
+                  fetch-depth: 0
+
+            - name: Configure Git
+              run: |
+                  git config user.name "github-actions[bot]"
+                  git config user.email "github-actions[bot]@users.noreply.github.com"
+
+            - name: Add upstream remote
+              run: git remote add upstream https://github.com/AlexandreRouma/SDRPlusPlus.git
+
+            - name: Fetch upstream
+              run: git fetch upstream
+
+            - name: Check for new commits
+              id: check
+              run: |
+                  # 检测上游默认分支
+                  UPSTREAM_BRANCH="upstream/master"
+                  if ! git rev-parse --verify "$UPSTREAM_BRANCH" >/dev/null 2>&1; then
+                      UPSTREAM_BRANCH="upstream/main"
+                  fi
+                  echo "upstream_branch=$UPSTREAM_BRANCH" >> $GITHUB_OUTPUT
+
+                  NEW_COMMITS=$(git log HEAD.."$UPSTREAM_BRANCH" --oneline 2>/dev/null || echo "")
+                  if [ -z "$NEW_COMMITS" ]; then
+                      echo "has_changes=false" >> $GITHUB_OUTPUT
+                      echo "### No upstream changes" >> $GITHUB_STEP_SUMMARY
+                  else
+                      echo "has_changes=true" >> $GITHUB_OUTPUT
+                      COMMIT_COUNT=$(echo "$NEW_COMMITS" | wc -l)
+                      echo "commit_count=$COMMIT_COUNT" >> $GITHUB_OUTPUT
+                      {
+                          echo "### Upstream commits ($COMMIT_COUNT)"
+                          echo '```'
+                          echo "$NEW_COMMITS"
+                          echo '```'
+                      } >> $GITHUB_STEP_SUMMARY
+                  fi
+
+            - name: Get changed localized files
+              id: localized
+              if: steps.check.outputs.has_changes == 'true'
+              run: |
+                  UPSTREAM_BRANCH="${{ steps.check.outputs.upstream_branch }}"
+                  CHANGED_FILES=$(git diff HEAD.."$UPSTREAM_BRANCH" --name-only)
+
+                  AFFECTED=""
+                  while IFS= read -r file; do
+                      [[ -z "$file" || "$file" =~ ^# ]] && continue
+                      if echo "$CHANGED_FILES" | grep -qxF "$file"; then
+                          AFFECTED="${AFFECTED}${file}"$'\n'
+                      fi
+                  done < scripts/localized_files.txt
+
+                  AFFECTED=$(echo "$AFFECTED" | sed '/^$/d')
+                  if [ -z "$AFFECTED" ]; then
+                      echo "has_localized_changes=false" >> $GITHUB_OUTPUT
+                      echo "### No localized files affected" >> $GITHUB_STEP_SUMMARY
+                  else
+                      echo "has_localized_changes=true" >> $GITHUB_OUTPUT
+                      AFFECTED_COUNT=$(echo "$AFFECTED" | wc -l)
+                      echo "affected_count=$AFFECTED_COUNT" >> $GITHUB_OUTPUT
+                      {
+                          echo "affected_files<<EOF"
+                          echo "$AFFECTED"
+                          echo "EOF"
+                      } >> $GITHUB_OUTPUT
+                      {
+                          echo "### Localized files affected ($AFFECTED_COUNT)"
+                          echo '```'
+                          echo "$AFFECTED"
+                          echo '```'
+                      } >> $GITHUB_STEP_SUMMARY
+                  fi
+
+            - name: Merge upstream changes
+              if: steps.check.outputs.has_changes == 'true'
+              run: |
+                  UPSTREAM_BRANCH="${{ steps.check.outputs.upstream_branch }}"
+                  if git merge "$UPSTREAM_BRANCH" --no-edit; then
+                      echo "✅ Merge succeeded (no conflicts)"
+                  else
+                      echo "⚠️ Merge conflicts detected, resolving..."
+                      CONFLICTS=$(git diff --name-only --diff-filter=U)
+                      for file in $CONFLICTS; do
+                          echo "  Resolving: $file (take upstream)"
+                          git checkout --theirs "$file"
+                          git add "$file"
+                      done
+                      git commit --no-edit
+                      echo "✅ Conflicts resolved"
+                  fi
+
+            - name: Push merged changes
+              if: steps.check.outputs.has_changes == 'true'
+              run: git push origin master
+
+            - name: Create re-localization issue
+              if: steps.localized.outputs.has_localized_changes == 'true'
+              uses: actions/github-script@v7
+              with:
+                  script: |
+                      const affectedFiles = `${{ steps.localized.outputs.affected_files }}`;
+                      const commitCount = `${{ steps.check.outputs.commit_count }}`;
+                      const affectedCount = `${{ steps.localized.outputs.affected_count }}`;
+                      const fileList = affectedFiles.trim().split('\n')
+                          .filter(f => f.trim())
+                          .map(f => `- \`${f.trim()}\``)
+                          .join('\n');
+                      const date = new Date().toISOString().split('T')[0];
+
+                      // 检查是否已有同名 issue 打开
+                      const existingIssues = await github.rest.issues.listForRepo({
+                          owner: context.repo.owner,
+                          repo: context.repo.repo,
+                          state: 'open',
+                          labels: 'upstream-sync',
+                          per_page: 5
+                      });
+
+                      // 关闭旧的同步 issue
+                      for (const issue of existingIssues.data) {
+                          if (issue.title.startsWith('🔄 上游更新需要重新汉化')) {
+                              await github.rest.issues.update({
+                                  owner: context.repo.owner,
+                                  repo: context.repo.repo,
+                                  issue_number: issue.number,
+                                  state: 'closed',
+                                  body: issue.body + '\n\n---\n_此 Issue 已被新的同步检测替代，自动关闭。_'
+                              });
+                          }
+                      }
+
+                      // 创建新 issue
+                      await github.rest.issues.create({
+                          owner: context.repo.owner,
+                          repo: context.repo.repo,
+                          title: `🔄 上游更新需要重新汉化 (${date})`,
+                          body: `## 上游同步检测\n\n上游 SDR++ 仓库有 **${commitCount}** 个新提交，其中 **${affectedCount}** 个汉化文件受影响，需要重新汉化。\n\n上游代码已自动合并到本仓库。请运行汉化流程处理以下文件。\n\n### 受影响的汉化文件\n${fileList}\n\n---\n_此 Issue 由自动化工作流创建。合并后请运行 \\\`bash scripts/sync_upstream.sh check\\\` 确认状态，然后执行汉化流程。_`,
+                          labels: ['localization', 'upstream-sync']
+                      });
+
+            - name: Summary
+              if: always() && steps.check.outputs.has_changes == 'true'
+              run: |
+                  echo "## Sync Summary" >> $GITHUB_STEP_SUMMARY
+                  echo "- Upstream commits merged: ${{ steps.check.outputs.commit_count }}" >> $GITHUB_STEP_SUMMARY
+                  echo "- Localized files affected: ${{ steps.localized.outputs.affected_count || '0' }}" >> $GITHUB_STEP_SUMMARY
+                  if [ "${{ steps.localized.outputs.has_localized_changes }}" = "true" ]; then
+                      echo "- ⚠️ Re-localization needed! Check the created issue." >> $GITHUB_STEP_SUMMARY
+                  else
+                      echo "- ✅ No re-localization needed" >> $GITHUB_STEP_SUMMARY
+                  fi

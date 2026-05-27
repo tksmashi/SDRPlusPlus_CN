@@ -1,0 +1,81 @@
+# SDR++ 汉化文件清单
+# 此文件列出了所有已汉化的源代码文件路径（相对于项目根目录）
+# 用于上游同步时检测哪些汉化文件受影响
+# 维护说明：新增汉化文件时请同步更新此清单
+
+## core/ GUI 核心界面
+core/src/gui/dialogs/credits.cpp
+core/src/gui/main_window.cpp
+core/src/gui/menus/bandplan.cpp
+core/src/gui/menus/display.cpp
+core/src/gui/menus/module_manager.cpp
+core/src/gui/menus/source.cpp
+core/src/gui/menus/theme.cpp
+core/src/gui/menus/vfo_color.cpp
+core/src/gui/widgets/waterfall.cpp
+
+## decoder_modules/ 解调模块
+decoder_modules/atv_decoder/src/main.cpp
+decoder_modules/falcon9_decoder/src/main.cpp
+decoder_modules/m17_decoder/src/lsf_decode.cpp
+decoder_modules/m17_decoder/src/main.cpp
+decoder_modules/meteor_demodulator/src/main.cpp
+decoder_modules/pager_decoder/src/flex/decoder.h
+decoder_modules/pager_decoder/src/main.cpp
+decoder_modules/pager_decoder/src/pocsag/decoder.h
+decoder_modules/radio/src/demodulators/am.h
+decoder_modules/radio/src/demodulators/cw.h
+decoder_modules/radio/src/demodulators/dsb.h
+decoder_modules/radio/src/demodulators/lsb.h
+decoder_modules/radio/src/demodulators/nfm.h
+decoder_modules/radio/src/demodulators/usb.h
+decoder_modules/radio/src/demodulators/wfm.h
+decoder_modules/radio/src/radio_module.h
+decoder_modules/vor_receiver/src/main.cpp
+decoder_modules/weather_sat_decoder/src/main.cpp
+decoder_modules/weather_sat_decoder/src/noaa_hrpt_decoder.h
+
+## misc_modules/ 杂项模块
+misc_modules/frequency_manager/src/main.cpp
+misc_modules/iq_exporter/src/main.cpp
+misc_modules/recorder/src/main.cpp
+misc_modules/rigctl_client/src/main.cpp
+misc_modules/rigctl_server/src/main.cpp
+misc_modules/scanner/src/main.cpp
+misc_modules/scheduler/src/actions/tune_vfo.h
+misc_modules/scheduler/src/sched_task.h
+
+## sink_modules/ 输出模块
+sink_modules/network_sink/src/main.cpp
+
+## source_modules/ 信号源模块
+source_modules/airspy_source/src/main.cpp
+source_modules/airspyhf_source/src/main.cpp
+source_modules/audio_source/src/main.cpp
+source_modules/bladerf_source/src/main.cpp
+source_modules/dragonlabs_source/src/main.cpp
+source_modules/file_source/src/main.cpp
+source_modules/fobossdr_source/src/main.cpp
+source_modules/hackrf_source/src/main.cpp
+source_modules/harogic_source/src/main.cpp
+source_modules/hermes_source/src/main.cpp
+source_modules/hydrasdr_source/src/main.cpp
+source_modules/kcsdr_source/src/main.cpp
+source_modules/limesdr_source/src/main.cpp
+source_modules/network_source/src/main.cpp
+source_modules/perseus_source/src/main.cpp
+source_modules/plutosdr_source/src/main.cpp
+source_modules/rfnm_source/src/main.cpp
+source_modules/rfspace_source/src/main.cpp
+source_modules/rtl_sdr_source/src/main.cpp
+source_modules/rtl_tcp_source/src/main.cpp
+source_modules/sddc_source/libsddc/utils/sddc_info/src/main.cpp
+source_modules/sddc_source/libsddc/utils/sddc_rx/src/main.cpp
+source_modules/sddc_source/src/main.cpp
+source_modules/sdrplay_source/src/main.cpp
+source_modules/sdrpp_server_source/src/main.cpp
+source_modules/soapy_source/src/main.cpp
+source_modules/spectran_http_source/src/main.cpp
+source_modules/spectran_source/src/main.cpp
+source_modules/spyserver_source/src/main.cpp
+source_modules/usrp_source/src/main.cpp
