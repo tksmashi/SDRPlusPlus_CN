@@ -10,14 +10,18 @@
 
 ### core/ (核心界面)
 - `core/src/gui/main_window.cpp` — 菜单注册、调试面板、加载屏幕、瀑布图控件
-- `core/src/gui/menus/source.cpp` — 信号源菜单（IQ校正、偏移量、抽取）
+- `core/src/gui/menus/source.cpp` — 信号源菜单（IQ校正、偏移量、抽取、添加偏移量弹窗）
 - `core/src/gui/menus/display.cpp` — 显示设置菜单
 - `core/src/gui/menus/bandplan.cpp` — 频段规划菜单
 - `core/src/gui/menus/theme.cpp` — 主题菜单
 - `core/src/gui/menus/vfo_color.cpp` — VFO颜色菜单
 - `core/src/gui/menus/module_manager.cpp` — 模块管理器菜单
-- `core/src/gui/dialogs/credits.cpp` — 关于/致谢对话框
+- `core/src/gui/dialogs/credits.cpp` — 关于/致谢对话框（含构建时间）
+- `core/src/gui/dialogs/dialog_box.h` — 通用对话框按钮（确定/是/否/应用/取消）
 - `core/src/gui/widgets/waterfall.cpp` — 瀑布图 VFO 信号强度提示、Ctrl+点击频率/带宽/带宽锁定 tooltip
+- `core/src/gui/widgets/menu.cpp` — 菜单锁定提示
+- `core/src/core.cpp` — defConfig 菜单名/模块实例名/偏移量/sink 默认值
+- `core/backends/glfw/backend.cpp` — 窗口标题栏构建时间
 
 ### decoder_modules/ (解调模块)
 - `decoder_modules/radio/src/radio_module.h` — Radio 模块主 UI
@@ -29,13 +33,14 @@
 - `decoder_modules/radio/src/demodulators/wfm.h` — WFM 解调器
 - `decoder_modules/radio/src/demodulators/nfm.h` — NFM 解调器
 - `decoder_modules/pager_decoder/` — 寻呼机解码器（协议、录制、查看消息）
-- `decoder_modules/weather_sat_decoder/` — 气象卫星解码器（录制、显示图像）
+- `decoder_modules/weather_sat_decoder/` — 气象卫星解码器（录制、显示图像、NOAA HRPT解码器窗口）
 - `decoder_modules/falcon9_decoder/` — Falcon9 遥测解码器（隐藏/显示日志、清除日志）
 - `decoder_modules/atv_decoder/` — ATV 解码器（水平/垂直同步、快速锁定、彩色模式、增益/偏移/副载波信息）
 - `decoder_modules/vor_receiver/` — VOR 接收器（方位角、信号质量）
-- `decoder_modules/meteor_demodulator/` — Meteor 解调器（录制/停止、录制状态）
+- `decoder_modules/meteor_demodulator/` — Meteor 解调器（录制/停止、录制状态、断续调制）
 - `decoder_modules/m17_decoder/` — M17 解码器（源/目标/数据类型/加密信息、参考线、状态）
-- `decoder_modules/m17_decoder/src/lsf_decode.cpp` — M17 数据类型和加密类型文本
+- `decoder_modules/m17_decoder/src/lsf_decode.cpp` — M17 数据类型和加密类型文本（无效/广播）
+- `decoder_modules/kg_sstv_decoder/` — SSTV 解码器（显示参考线）
 
 ### misc_modules/ (杂项模块)
 - `misc_modules/recorder/src/main.cpp` — 录制器模块
@@ -46,9 +51,15 @@
 - `misc_modules/iq_exporter/src/main.cpp` — IQ 导出模块（含错误提示框）
 - `misc_modules/scheduler/src/sched_task.h` — 调度器任务
 - `misc_modules/scheduler/src/actions/tune_vfo.h` — 调度器 VFO 调谐动作
+- `misc_modules/scheduler/src/main.cpp` — 调度器主界面（待办标签）
+- `misc_modules/demo_module/src/main.cpp` — 演示模块
 
 ### sink_modules/ (输出模块)
 - `sink_modules/network_sink/src/main.cpp` — 网络音频输出
+- `sink_modules/audio_sink/src/main.cpp` — 音频输出（注册名→音频）
+- `sink_modules/portaudio_sink/src/main.cpp` — PortAudio 输出（注册名→音频）
+- `sink_modules/new_portaudio_sink/src/main.cpp` — 新 PortAudio 输出（注册名→新音频）
+- `sink_modules/android_audio_sink/src/main.cpp` — Android 音频输出（注册名→音频）
 
 ### source_modules/ (信号源模块) — 全部 28+ 模块
 - rtl_sdr_source, soapy_source, hackrf_source, airspy_source, airspyhf_source
