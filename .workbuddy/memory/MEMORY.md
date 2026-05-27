@@ -66,6 +66,8 @@
 - OptionList.define() 的第一个参数（key）保持不变，只改第二个参数（显示文本）
 - 保留名称的比较逻辑需同步更新（如 offsets.define("无", ...) 后 strcmp 也改为 "无"）
 - imgui_demo.cpp 是 ImGui 库的演示文件，不需要翻译
+- MSVC 编译必须加 /utf-8（CMakeLists.txt 已配置），否则中文字符串按 GBK 解读致乱码
+- 中文字体通过系统 CJK 字体 + ImGui MergeMode 合并到 Roboto baseFont（style.cpp 已配置）
 
 ## 不翻译的内容
 - imgui_demo.cpp / imgui_widgets.cpp 等 ImGui 库文件
